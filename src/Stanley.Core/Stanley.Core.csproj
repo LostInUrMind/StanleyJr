@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Domain logic only: no Discord, no Entity Framework, no I/O.
+    Everything here is unit-testable without a database or a Discord connection.
+  -->
+
+</Project>

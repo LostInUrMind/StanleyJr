@@ -1,0 +1,21 @@
+<Project>
+
+  <!-- Settings shared by every project. Change them here, not per project. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--
+      Globalization stays on: NameNormalizer folds accents with Unicode normalization
+      (Très Chic -> treschic), and invariant mode makes string.Normalize a no-op, which
+      silently breaks that lookup. The runtime image must therefore carry ICU.
+    -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- Compile-time safety is the point of choosing C# (CLAUDE.md): a warning is a bug. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Stanley.Core.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Stanley.Core\Stanley.Core.csproj" />
+    <!--
+      Referenced for SeedData alone: the evolution counts the formula needs live there, and a
+      test that re-typed them would stop proving the seed is right.
+    -->
+    <ProjectReference Include="..\..\src\Stanley.Data\Stanley.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Fixtures\max-stats.golden.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

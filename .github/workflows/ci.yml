@@ -1,0 +1,39 @@
+name: CI
+
+# Every pull request is built and tested (NFR-07).
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        # Warnings are errors (Directory.Build.props), so this is also the style gate.
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        # Includes the database tests: the runner has Docker, so Testcontainers starts a real
+        # PostgreSQL and the migration is applied for every run.
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Check the migrations match the model
+        # Fails if someone changed an entity without adding a migration.
+        run: |
+          dotnet tool install --global dotnet-ef --version 10.0.12
+          dotnet ef migrations has-pending-model-changes --project src/Stanley.Data
+
+      - name: Build the bot image
+        run: docker build --tag stanley-bot:ci .

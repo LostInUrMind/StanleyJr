@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Stanley.Importer</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Stanley.Core\Stanley.Core.csproj" />
+    <ProjectReference Include="..\..\src\Stanley.Data\Stanley.Data.csproj" />
+  </ItemGroup>
+
+</Project>

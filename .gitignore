@@ -1,0 +1,40 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+artifacts/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+
+# Local secrets and environment
+.env
+*.env.local
+appsettings.Local.json
+appsettings.Development.json
+
+# Tooling
+*.received.*
+TestResults/
+coverage*
+.claude/
+.agents/
+
+# Misc and archived files
+.misc/
+.old/
+
+# OS-generated files
+[Tt]humbs.db
+[Dd]esktop.ini
+.DS_Store
+
+# NuGet packages & symbols
+*.nupkg
+*.snupkg
+
+# Dumps and local databases
+*.dmp
+*.mdf
+*.ldf
