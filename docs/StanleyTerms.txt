@@ -1,0 +1,221 @@
+TERMS OF SERVICE
+
+Stanley, a Discord bot for Skullgirls Mobile fighter information
+
+Last updated: 19 October 2026
+
+
+1. ACCEPTANCE OF THESE TERMS
+
+These Terms of Service (the "Terms") are an agreement between The SGM Wiki
+Team ("we", "us"), the operator of the Stanley Discord bot ("Stanley", the
+"Bot"), and you, the person using it ("you").
+
+You accept these Terms by using Stanley: by running one of its commands, or
+by adding it to a Discord server. If you do not accept them, do not use the
+Bot, and remove it from any server you administer.
+
+Using Stanley also requires you to follow Discord's own Terms of Service,
+Community Guidelines and Developer Terms of Service. Where these Terms
+conflict with Discord's, Discord's prevail.
+
+
+2. WHAT STANLEY DOES
+
+Stanley answers questions about Skullgirls Mobile fighters inside Discord.
+It works only through Discord slash commands:
+
+  /fighter      shows a card for one fighter: rarity, element, character,
+                signature abilities, minimum and maximum stats, portrait
+  /wiki         returns the Skullgirls Mobile Fandom wiki URL for a page
+  /alias list   lists the alternative names recorded for a fighter
+  /credits      shows contributor credits and links to these Terms and to
+                the Privacy Policy
+
+A smaller set of management commands (/fighter-admin and /alias-admin) is
+restricted to editors; see section 7.
+
+Stanley does not read ordinary chat messages, does not use any of Discord's
+privileged intents (Message Content, Server Members, Presence), and does not
+store any information about people who only read its replies.
+
+
+3. WHO MAY USE STANLEY
+
+You may use Stanley if you meet Discord's minimum age requirement for your
+country and your Discord account is in good standing. Stanley is not
+directed at children below that age.
+
+Stanley is free. We do not charge for it, and there is no paid tier.
+
+
+4. ADDING AND REMOVING STANLEY
+
+Only a person with the "Manage Server" permission can add Stanley to a
+Discord server. By adding it, that person confirms they are authorised to do
+so for that server and accepts these Terms on the server's behalf.
+
+Server administrators control where Stanley can be used through Discord's
+own settings: Server Settings -> Integrations -> Stanley, where commands can
+be limited by channel and by role. Stanley has no channel whitelist command
+of its own.
+
+You may remove Stanley from a server at any time, which ends its use there.
+
+
+5. ACCURACY OF INFORMATION, AND NO AFFILIATION
+
+Stanley is an unofficial fan project. We are not affiliated with, authorised
+by, endorsed by or sponsored by Autumn Games LLC, Hidden Variable Studios,
+Fandom, Discord Inc. or any of their affiliates. "Skullgirls" and "Skullgirls
+Mobile", and all related names, characters and artwork, belong to their
+respective owners.
+
+Fighter data is maintained by volunteer editors and is provided for
+information only. It can be incomplete, out of date or wrong, and game
+balance changes can make it wrong without notice. Do not rely on it for any
+decision that matters to you; check the game itself.
+
+Stanley also shows and links to material it does not control: pages on the
+Skullgirls Mobile Fandom wiki, and fighter portraits loaded from external
+URLs. We do not host those images, and we are not responsible for
+third-party content, nor for the privacy practices of the sites that serve
+it.
+
+
+6. ACCEPTABLE USE
+
+You must not:
+
+  a) use Stanley in any way that breaks applicable law or Discord's rules,
+     or that infringes anyone's rights;
+  b) use Stanley to harass, deceive or abuse other people;
+  c) submit content through its commands that is unlawful, hateful,
+     sexually explicit, defamatory, or that is not genuine Skullgirls Mobile
+     fighter information;
+  d) attempt to gain editor rights you have not been given, or to bypass
+     its permission checks;
+  e) deliberately overload, disrupt, probe or reverse-engineer the Bot or
+     the systems it runs on, or automate its commands at a volume beyond
+     ordinary human use;
+  f) scrape, copy or redistribute its data in bulk to run a competing
+     service, or resell access to it;
+  g) present Stanley or its output as official Skullgirls Mobile material.
+
+We may limit or withdraw your access to the Bot, or remove it from a server,
+if we reasonably believe this section has been broken.
+
+
+7. EDITORS
+
+Some commands write to Stanley's database. They are restricted to editors:
+people we have granted a Wiki Editor role for this purpose. Editor rights
+are granted at our discretion and may be changed or withdrawn at any time.
+
+If you are an editor:
+
+  a) you add and correct fighter and alias data in good faith, using
+     information you are entitled to share;
+  b) you accept that every add, edit and removal is recorded with your
+     Discord user ID, the time of the change, the action, and the values
+     before and after it, so that changes can be reviewed and undone (see
+     the Privacy Policy);
+  c) you grant us a non-exclusive, worldwide, royalty-free licence to store,
+     display and distribute the content you submit through the Bot, and to
+     keep it in the Bot's data after your editor rights end;
+  d) you accept that we may correct, overwrite or remove any content you
+     submit.
+
+
+8. AVAILABILITY AND CHANGES TO THE BOT
+
+Stanley runs on a single small server and is offered as it is, without any
+promise of availability. We may change, suspend, interrupt or discontinue it
+or any of its commands at any time, including for maintenance, and without
+notice. We are not liable to you or to anyone else for doing so.
+
+
+9. INTELLECTUAL PROPERTY
+
+The Bot's source code and its original text remain ours, except for
+third-party components used under their own licences.
+
+The game data Stanley reports, the characters and artwork it refers to, the
+wiki content it links to and the portraits it displays are the property of
+their respective owners, and are used here for informational,
+non-commercial fan purposes.
+
+Nothing in these Terms transfers ownership of anything to you.
+
+
+10. PRIVACY
+
+Our handling of personal information is described in the Stanley Privacy
+Policy, which forms part of these Terms.
+
+
+11. DISCLAIMER OF WARRANTIES
+
+To the fullest extent permitted by law, Stanley is provided "as is" and "as
+available", without warranties of any kind, express or implied, including
+any implied warranty of merchantability, fitness for a particular purpose,
+accuracy or non-infringement. We do not warrant that the Bot will be
+uninterrupted, timely, secure or free of errors, or that its data is
+accurate or complete.
+
+Nothing in these Terms excludes or limits any right or guarantee that
+applicable consumer law gives you and that cannot lawfully be excluded.
+
+
+12. LIMITATION OF LIABILITY
+
+To the fullest extent permitted by law, we are not liable for any indirect,
+incidental, special, consequential or punitive loss, nor for any loss of
+profit, revenue, data, goodwill or opportunity, arising out of or connected
+with your use of, or inability to use, Stanley, however caused.
+
+Because Stanley is provided free of charge, our total liability to you for
+all claims connected with it is limited to NZD 100.
+
+
+13. INDEMNITY
+
+You agree to indemnify and hold us harmless against claims, damages,
+liabilities, costs and reasonable legal fees arising from your use of
+Stanley in breach of these Terms or of applicable law, or from content you
+submit through it.
+
+
+14. TERMINATION
+
+You may stop using Stanley at any time, and a server administrator may
+remove it at any time. We may stop providing it, or withdraw your access to
+it, at any time.
+
+Sections 5, 9, 11, 12, 13 and 16 survive termination. Removing the Bot does
+not by itself delete change records that already exist; the Privacy Policy
+explains how to request deletion.
+
+
+15. CHANGES TO THESE TERMS
+
+We may update these Terms. The current version is always the one published
+in the project's public GitHub repository, at the URL entered in the Discord
+Developer Portal and linked from /credits, with the date of the last change
+at the top. Material changes are announced in Stanley's support channel on
+Discord where practical. Continuing to use Stanley after a change means you
+accept the updated Terms.
+
+
+16. GOVERNING LAW
+
+These Terms are governed by the laws of New Zealand, and disputes will be
+brought before the courts of New Zealand. Either party may still seek
+urgent interim relief in any competent court, and nothing here removes any
+right you have to bring a claim before a consumer tribunal or regulator in
+your own country of residence.
+
+
+17. CONTACT
+
+Questions about these Terms: nhatnm.work@gmail.com

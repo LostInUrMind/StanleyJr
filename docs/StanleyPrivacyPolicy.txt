@@ -1,0 +1,178 @@
+PRIVACY POLICY
+
+Stanley, a Discord bot for Skullgirls Mobile fighter information
+
+Last updated: 19 October 2026
+Effective: 19 October 2026
+
+
+1. WHO THIS POLICY IS FROM
+
+Stanley ("Stanley", the "Bot") is a Discord bot operated by The SGM Wiki
+Team ("we", "us"). This policy explains what personal information Stanley
+handles, why, how long it is kept, and how to have it deleted. It covers the
+Bot only, not Discord itself and not any website the Bot links to.
+
+Contact for any privacy question or request: dompark3147@gmail.com
+
+
+2. THE SHORT VERSION
+
+  - If you only read Stanley's replies, we store nothing about you.
+  - Stanley works only through slash commands. It cannot read your
+    messages: it uses none of Discord's privileged intents (Message
+    Content, Server Members, Presence).
+  - The only personal information Stanley keeps is the Discord user ID of
+    an editor against each change they make to fighter or alias data.
+  - We do not sell, rent or trade personal information, we show no
+    advertising, and we run no tracking or profiling.
+
+
+3. WHAT STANLEY HANDLES, AND WHY
+
+a) Reading commands (/fighter, /wiki, /alias list, /credits)
+
+When you run a command, Discord sends Stanley the information it needs to
+reply: your Discord user ID, the server and channel the command came from,
+and the text you typed as the command's options. Stanley uses this in memory
+to build the reply and then discards it. None of it is written to the
+database.
+
+Why: to answer the command you ran.
+
+b) Editing commands (/fighter-admin, /alias-admin)
+
+When an editor adds, edits or removes fighter or alias data, Stanley writes
+a change record containing the editor's Discord user ID, the time of the
+change, the action, and the values before and after it. This is the only
+place Stanley stores a Discord user ID.
+
+Why: so that incorrect or abusive edits to shared community data can be
+reviewed, attributed and undone. This is a legitimate interest in the
+integrity of the data; for editors in the UK/EU, that is our lawful basis.
+
+c) Fighter data itself
+
+Stanley's database holds Skullgirls Mobile game information: characters,
+fighters (name, character, rarity, element, ability name, base stats and a
+portrait URL), signature ability text, and aliases. Portraits are not
+hosted by us; only their external URLs are stored. This is game
+information, not personal information about you.
+
+d) Operational logs
+
+The server keeps technical logs so faults can be diagnosed. A log entry
+about an error may include the name of the command, the server ID and the
+Discord user ID of the person who ran it. Logs stay on the server in a
+rotating buffer that the Bot's container configuration caps at three files
+of 10 MB per container: once the cap is reached, the oldest entries are
+deleted automatically. They are not copied anywhere else, are not part of
+the database backup, and are not used to build any profile.
+
+Why: keeping the Bot working and secure.
+
+
+4. WHAT STANLEY NEVER COLLECTS
+
+  - the content of your messages, in servers or in DMs
+  - member lists, roles, presence or online status, voice activity
+  - your email address, real name, address or any payment information
+  - attachments, images or files you post
+  - information about people who only read Stanley's replies
+  - anything through cookies, trackers or third-party analytics
+
+
+5. WHO ELSE IS INVOLVED
+
+We share personal information with no one for their own purposes. It is
+handled on our behalf by:
+
+  - Discord Inc., the platform Stanley runs on. Everything you send to
+    Stanley passes through Discord first and is also covered by Discord's
+    own privacy policy.
+  - netcup GmbH, which hosts the single server running the Bot and its
+    PostgreSQL database, in a United States or European Union region.
+  - the off-site storage holding the nightly database backup.
+
+We will disclose information if we are legally required to, for example in
+response to a valid legal process, and we may disclose it where necessary
+to investigate abuse of the Bot.
+
+Separately, your Discord client loads fighter portraits from external image
+URLs and you may follow links to the Skullgirls Mobile Fandom wiki. Those
+requests go to third parties under their own privacy policies; we receive
+nothing from them.
+
+
+6. WHERE DATA IS HELD, AND FOR HOW LONG
+
+The database runs on one server in a United States or European Union
+region. If you are in the UK or EU, your information may therefore 
+be transferred outside your country; we rely on appropriate safeguards 
+for any such transfer.
+
+Retention:
+
+  - reading-command data: not retained (discarded once the reply is sent)
+  - change records: kept while Stanley operates, so edits stay auditable,
+    or until a deletion request is completed (section 7)
+  - operational logs: no fixed period. They are capped by size, and the
+    oldest entries are deleted automatically as new ones arrive, which in
+    normal operation is a window of days rather than months
+  - backups: each nightly backup is kept only until newer ones replace it.
+    A deletion is applied to the live database as soon as it is completed,
+    and can still appear in a stored backup copy until that copy is
+    replaced
+
+
+7. YOUR RIGHTS AND HOW TO USE THEM
+
+You may ask us to:
+
+  - tell you what information we hold about you, and give you a copy;
+  - correct information that is wrong;
+  - delete your Discord user ID from Stanley's change records. We complete
+    such requests within 30 days. The record of the change itself is kept
+    for data integrity, with the editor's ID replaced by an anonymous
+    marker;
+  - object to or restrict our handling of your information.
+
+Email nhatnm.work@gmail.com from an address we can act on, or ask us in
+Stanley's support channel on Discord, and tell us your Discord username and
+user ID. We may ask you to confirm, through Discord, that the account is
+yours.
+
+Depending on where you live you may also have the right to complain to a
+data protection authority: in New Zealand, the Office of the Privacy
+Commissioner; in the EU or UK, your national supervisory authority.
+
+
+8. CHILDREN
+
+Stanley is not directed at children under Discord's minimum age for their
+country, and we do not knowingly keep information about them. If you
+believe we hold such information, email us and we will delete it.
+
+
+9. SECURITY
+
+The database is not reachable from the internet; the bot token and the
+database password are held outside the source repository; access to the
+server is limited to the maintainers; backups are kept off the server. No
+system is perfectly secure, so we cannot guarantee absolute security, but
+the information Stanley holds is deliberately kept to a minimum.
+
+
+10. CHANGES TO THIS POLICY
+
+We may update this policy. The current version is always the one published
+in the project's public GitHub repository, at the URL entered in the Discord
+Developer Portal and linked from /credits, with the date of the last change
+at the top. Material changes are announced in Stanley's support channel on
+Discord where practical. Continuing to use Stanley after a change means you
+accept the updated policy.
+
+
+11. CONTACT
+
+The SGM Wiki Team - nhatnm.work@gmail.com
