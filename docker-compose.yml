@@ -48,12 +48,12 @@ services:
       Logging__LogLevel__Default: Information
       Logging__LogLevel__Microsoft: Warning
     logging: *default-logging
-    pids_limit: 256
     deploy:
       resources:
         limits:
           memory: 1g
           cpus: "1.5"
+          pids: 256
 
 volumes:
   postgres-data:
