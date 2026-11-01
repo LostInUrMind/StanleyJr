@@ -190,6 +190,50 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
     }
 
     [Fact]
+    public async Task A_quote_given_when_a_fighter_is_added_is_stored_and_recorded()
+    {
+        Character character = await AddCharacterAsync();
+        string name = Unique("Quoted");
+        const string quote = "Say hello to my little friend.";
+
+        FighterWriteResult added = await Fighters.AddAsync(
+            NewDraft(name, character.Name) with { Quote = quote },
+            Editor);
+
+        Assert.Equal(FighterWriteOutcome.Ok, added.Outcome);
+
+        await using StanleyDbContext db = postgres.CreateContext();
+        Variant stored = await db.Variants.SingleAsync(variant => variant.Name == name);
+
+        Assert.Equal(quote, stored.Quote);
+
+        ChangeRecord record = await SingleRecordAsync(
+            db,
+            ChangeEntityType.Variant,
+            Key(stored.Id));
+
+        JsonNode after = JsonNode.Parse(record.After!)!;
+        Assert.Equal(quote, (string?)after["quote"]);
+    }
+
+    [Fact]
+    public async Task A_quote_of_whitespace_alone_is_refused_when_a_fighter_is_added()
+    {
+        Character character = await AddCharacterAsync();
+        string name = Unique("Blank Quote");
+
+        FighterWriteResult refused = await Fighters.AddAsync(
+            NewDraft(name, character.Name) with { Quote = "   " },
+            Editor);
+
+        Assert.Equal(FighterWriteOutcome.ValueMissing, refused.Outcome);
+        Assert.Equal(FighterField.Quote, refused.Field);
+
+        await using StanleyDbContext db = postgres.CreateContext();
+        Assert.False(await db.Variants.AnyAsync(variant => variant.Name == name));
+    }
+
+    [Fact]
     public async Task An_edit_changes_only_the_fields_given_and_reports_them_old_and_new()
     {
         Variant fighter = await AddFighterAsync();

@@ -86,7 +86,11 @@ public sealed class FighterAdminModule(FighterAdminRepository fighters)
             "Web address of the fighter's portrait. Stanley links it, never hosts it.")]
         [MinLength(1)]
         [MaxLength(MaxUrlLength)]
-        string portraitUrl)
+        string portraitUrl,
+        [Summary("quote", "The fighter's quote.")]
+        [MinLength(1)]
+        [MaxLength(MaxQuoteLength)]
+        string? quote = null)
     {
         // The rarity and the element travel as their names: the repository matches them against
         // the seeded rows, so a list that has drifted from the table is a refusal, not a guess.
@@ -99,7 +103,8 @@ public sealed class FighterAdminModule(FighterAdminRepository fighters)
             atk,
             hp,
             fs,
-            portraitUrl);
+            portraitUrl,
+            quote);
 
         FighterWriteResult result = await fighters.AddAsync(draft, Editor);
 
