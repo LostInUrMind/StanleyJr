@@ -19,4 +19,5 @@ public sealed record FighterDraft(
     int BaseAtk,
     int BaseHp,
     int BaseFs,
-    string? PortraitUrl);
+    string? PortraitUrl,
+    string? Quote = null);

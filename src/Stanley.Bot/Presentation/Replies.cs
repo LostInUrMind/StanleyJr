@@ -17,10 +17,14 @@ internal static class Replies
     /// <summary>
     /// The credits: who made Stanley.
     /// </summary>
-    public static string Credits(string? icon) =>
-        string.IsNullOrWhiteSpace(icon)
+    public static string Credits(string? icon)
+    {
+        string developed = string.IsNullOrWhiteSpace(icon)
             ? "Developed by The SGM Wiki Team"
             : $"Developed by {icon} The SGM Wiki Team";
+
+        return $"{developed}\nArt by @switch5721";
+    }
 
     /// <summary>
     /// The reply to an interaction for a command Stanley no longer has.

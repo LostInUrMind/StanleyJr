@@ -51,12 +51,14 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
         string name = draft.Name?.Trim() ?? string.Empty;
         string slug = NameNormalizer.Normalize(name);
         string saName = draft.AbilityName?.Trim() ?? string.Empty;
+        string? quote = draft.Quote?.Trim();
         string portraitUrl = draft.PortraitUrl?.Trim() ?? string.Empty;
 
         FighterWriteResult? refusal =
             CheckRequired(name, FighterField.Name)
             ?? CheckSlug(name, slug)
             ?? CheckRequired(saName, FighterField.AbilityName)
+            ?? CheckGiven(quote, FighterField.Quote)
             ?? CheckStat(draft.BaseAtk, FighterField.BaseAtk)
             ?? CheckStat(draft.BaseHp, FighterField.BaseHp)
             ?? CheckStat(draft.BaseFs, FighterField.BaseFs)
@@ -97,6 +99,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
         {
             Name = name,
             Slug = slug,
+            Quote = quote,
             CharacterId = character.Id,
             TierId = tier.Id,
             ElementId = element.Id,

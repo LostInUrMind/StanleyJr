@@ -3,19 +3,13 @@
 A Discord bot that answers questions about Skullgirls Mobile fighters. Slash commands only, with
 the fighter data in PostgreSQL so editors can correct it from inside Discord.
 
-This is the rebuild of the Python prefix bot in `.old/`. The requirements are in
-[`docs/Stanley-v2-FRD.docx`](docs/Stanley-v2-FRD.docx) (the master), the schema in
-[`docs/Stanley-v2-DB-Design.docx`](docs/Stanley-v2-DB-Design.docx), the plan in
-[`docs/migration-plan.md`](docs/migration-plan.md), and the architecture decisions in
+This README covers installing, running and changing Stanley. Using it is two manuals of their
+own:
 
-## What is here so far
-
-Phases 1 to 3 of the migration plan — the skeleton, the core logic, and the schema with its
-import — and the commands `/ping`, `/fighter`, `/wiki`, `/alias list` and `/credits` for
-everyone, plus the editor commands `/alias-admin` (`add`, `remove`) and `/fighter-admin`
-(`add`, `edit`, `ability`, `remove`). Still to write: the Terms of Service and Privacy Policy
-links FR-18 asks `/credits` for, which need the pages hosted first (phase 7), and the undo of
-FR-16, which is a "could".
+- [`docs/user-manual.md`](docs/user-manual.md) — the commands everyone can run, and the note for
+  server admins.
+- [`docs/editor-manual.md`](docs/editor-manual.md) — `/alias-admin` and `/fighter-admin`, for
+  wiki editors.
 
 ## Layout
 
@@ -170,18 +164,6 @@ docker compose -f docker-compose.yml -f ../pg-5433.yml up -d postgres
 ConnectionStrings__Stanley="Host=localhost;Port=5433;Database=<your_database_name>;Username=<your_user_name>;Password=<yours>" \n  dotnet run --project src/Stanley.Bot
 ```
 
-### Loading the fighter data
-
-```sh
-dotnet run --project tools/Stanley.Importer -- .old/fighters.json
-```
-
-It applies any pending migrations, then imports. It matches fighters on their slug and updates
-in place, so running it twice changes nothing (FR-21). It prints what it did and the resulting
-totals; at launch those are 18 characters, 309 fighters (306 collectible, 3 raid bosses) and 627
-signature abilities. Aliases start empty on purpose — editors add them with `/alias-admin add` after
-launch (FR-22).
-
 ## Tests
 
 ```sh
@@ -197,9 +179,6 @@ dotnet test
   ```sh
   dotnet test --filter "RequiresDocker!=true"
   ```
-
-The projects use xUnit v2 on VSTest rather than xUnit v3, because `dotnet test` on the .NET 10
-SDK drives it without extra configuration.
 
 ## Adding a command
 
@@ -226,13 +205,8 @@ the home server, both matched by ID. It fails closed: while `Discord:HomeGuildId
 
 **Write commands live in a top-level command of their own**, `/alias-admin` or
 `/fighter-admin`, which is what lets them be registered to the home server alone so they do not
-appear anywhere else (migration plan section 6). Discord registers a top-level command with all
-of its subcommands, and keeps a server's commands apart from the global ones, so a write
-*subcommand* of a command everyone can run cannot be narrowed: it is registered wherever its
-siblings are, and a guild copy carrying it would show up as a second `/alias` next to the global
-one. `DefaultMemberPermissions` is per top-level command for the same reason. So a new write
-command belongs on an `-admin` module (marked `[DontAutoRegister]`, which is what
-`DiscordBotService` registers to the home server), not next to a read command.
+appear anywhere else. Discord registers a top-level command with all of its subcommands, and keeps a server's commands apart from the global ones, so a write *subcommand* of a command everyone can run cannot be narrowed: it is registered wherever its siblings are, and a guild copy carrying it would show up as a second `/alias` next to the global one. `DefaultMemberPermissions` is per top-level command for the same reason. So a new write
+command belongs on an `-admin` module (marked `[DontAutoRegister]`, which is what `DiscordBotService` registers to the home server), not next to a read command.
 
 ## Letting editors change data
 
@@ -274,26 +248,10 @@ startup.
 
 ## Adding or correcting a fighter
 
-This is done in Discord, with no deploy and no developer:
-
-| Command | What it does |
-|---|---|
-| `/fighter-admin add` | Adds a fighter from its name, character, rarity, element, ability name, base stats and portrait URL (FR-12). It has no abilities yet. |
-| `/fighter-admin ability` | `Set one ability` opens a form for one SA — pre-filled when that SA exists — and `Remove all abilities` drops the block after a confirmation (FR-13). Leave `sa` out to add one at the end. |
-| `/fighter-admin edit` | Changes only the options you give, and confirms with the old and new value of each (FR-13). |
-| `/fighter-admin remove` | Removes a fighter, its abilities and its aliases, after a confirmation (FR-14). |
-
-`/fighter-admin` is registered to the home server alone, so it appears nowhere else, and every
-write is recorded with the editor's Discord ID in `change_records` (FR-15). A fighter added this
-way is on `/fighter` straight away; nothing is cached and nothing needs a restart.
-
-Two rules worth knowing before touching fighter data:
-
-- **Maximum stats are never stored.** They are computed per request from the base stats and the
-  tier (`StatCalculator`). Correcting a base stat corrects the card.
-- **Signature abilities are all or nothing.** A single ability is never removed on its own:
-  removal takes the whole block, which is then re-entered from SA1, so the SA numbers always run
-  from 1 with no gap (FR-13).
+In Discord, by a wiki editor, with no deploy and no developer:
+[`docs/editor-manual.md`](docs/editor-manual.md) is the whole of it. Every write is recorded
+with the editor’s Discord ID in `change_records` (FR-15), and a fighter added that way is on
+`/fighter` straight away — nothing is cached and nothing needs a restart.
 
 ## Changing the schema
 
@@ -336,8 +294,3 @@ works if you want the raw command.
 - Still to set up in phase 6: the nightly `pg_dump` to off-box storage **with one restore
   tested** (NFR-05), and an alert when the bot has been offline for five minutes.
 
-## For server admins
-
-Stanley has no channel whitelist command. Restrict it per channel and per role in
-**Server Settings → Integrations → Stanley**, which is Discord's own command-permissions UI
-(FR-19).

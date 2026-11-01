@@ -14,14 +14,27 @@ public class CreditsTests
 {
     private const string Skull = "<:SkullEmote:1560976711707918486>";
 
+    private const string Art = "Art by @switch5721";
+
     [Fact]
     public void The_credits_name_the_team_after_the_skull()
     {
         FighterPresentation presentation = WithSkull();
 
         Assert.Equal(
-            $"Developed by {Skull} The SGM Wiki Team",
+            $"Developed by {Skull} The SGM Wiki Team\n{Art}",
             Replies.Credits(presentation.FighterScoreIcon));
+    }
+
+    [Fact]
+    public void The_credits_name_the_artist_whether_or_not_the_emoji_is_configured()
+    {
+        Assert.EndsWith(
+            Art,
+            Replies.Credits(WithSkull().FighterScoreIcon),
+            StringComparison.Ordinal);
+
+        Assert.EndsWith(Art, Replies.Credits(null), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -32,10 +45,12 @@ public class CreditsTests
         var presentation = new FighterPresentation(Options.Create(new PresentationOptions()));
 
         Assert.Null(presentation.FighterScoreIcon);
-        Assert.Equal("Developed by The SGM Wiki Team", Replies.Credits(presentation.FighterScoreIcon));
+        Assert.Equal(
+            $"Developed by The SGM Wiki Team\n{Art}",
+            Replies.Credits(presentation.FighterScoreIcon));
 
         // A key set to blank is the same as no key: both mean nothing was configured.
-        Assert.Equal("Developed by The SGM Wiki Team", Replies.Credits("   "));
+        Assert.Equal($"Developed by The SGM Wiki Team\n{Art}", Replies.Credits("   "));
     }
 
     [Fact]
