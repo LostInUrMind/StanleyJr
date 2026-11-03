@@ -16,9 +16,9 @@ public class VariantAlias
 
     /// <summary>
     /// <see cref="Alias"/> normalized by the same <see cref="Core.Naming.NameNormalizer"/> as
-    /// <see cref="Variant.Slug"/>. Unique, which is what makes a duplicate alias impossible
-    /// (FR-10). A collision with a variant's own slug cannot be a database constraint, so the
-    /// command checks for it.
+    /// <see cref="Variant.Slug"/>. Unique, which is what makes a duplicate alias
+    /// impossible. A collision with a variant's own slug cannot be a database constraint,
+    /// so the command checks for it.
     /// </summary>
     public required string AliasSlug { get; set; }
 

@@ -7,7 +7,7 @@ using Stanley.Data.Lookup;
 namespace Stanley.Bot.Modules;
 
 /// <summary>
-/// The suggestions Discord shows while someone types a fighter name (FR-03).
+/// The suggestions Discord shows while someone types a fighter name.
 /// </summary>
 /// <remarks>
 /// Fighters only. <c>/wiki</c> also offers pages that are not fighters and uses

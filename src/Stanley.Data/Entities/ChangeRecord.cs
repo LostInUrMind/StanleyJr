@@ -1,18 +1,18 @@
 namespace Stanley.Data.Entities;
 
 /// <summary>
-/// One row per editor write: who, when, what, and the values before and after (FR-15).
+/// One row per editor write: who, when, what, and the values before and after.
 /// Database design section 3.7.
 /// </summary>
 /// <remarks>
 /// <para>
 /// This is the only table holding anything about a person, and only about editors. There is no
-/// editors table: who may edit is a Discord role checked by ID at run time (FR-17).
+/// editors table: who may edit is a Discord role checked by ID at run time.
 /// </para>
 /// <para>
 /// A write command appends exactly one row in the same transaction as the change: if the
 /// record cannot be written, the change is not committed. Nothing is ever deleted from this
-/// table by the bot, and an undo (FR-16) is applied as a new change that is itself recorded.
+/// table by the bot, and an undo is applied as a new change that is itself recorded.
 /// </para>
 /// </remarks>
 public class ChangeRecord
@@ -22,7 +22,7 @@ public class ChangeRecord
 
     /// <summary>
     /// Discord ID of the editor. Nullable so it can be cleared within 30 days of a removal
-    /// request while the change itself is kept (CR-02).
+    /// request while the change itself is kept.
     /// </summary>
     public long? ActorUserId { get; set; }
 

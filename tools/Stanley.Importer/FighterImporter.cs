@@ -9,7 +9,7 @@ using Stanley.Data.Entities;
 namespace Stanley.Importer;
 
 /// <summary>
-/// Imports v1's <c>fighters.json</c> into the database (FR-21).
+/// Imports v1's <c>fighters.json</c> into the database.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -221,5 +221,5 @@ internal sealed partial class FighterImporter(StanleyDbContext db)
             ? parsed
             : throw new InvalidOperationException(
                 $"'{fighter.Name}' has {stat} '{value}'; stats must be whole numbers greater "
-                + "than zero (FR-13).");
+                + "than zero.");
 }

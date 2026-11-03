@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using Stanley.Core.Naming;
@@ -11,10 +11,10 @@ using Stanley.Data.Lookup;
 namespace Stanley.Data.Tests;
 
 /// <summary>
-/// What <c>/fighter-admin</c> must do: add a fighter that can be read back at once (FR-12),
-/// change the fields an editor gave and refuse the values the rules forbid (FR-13), keep the SA
-/// numbers contiguous from 1 (FR-13), remove a fighter with everything that belongs to it
-/// (FR-14), and record every write (FR-15).
+/// What <c>/fighter-admin</c> must do: add a fighter that can be read back at once,
+/// change the fields an editor gave and refuse the values the rules forbid, keep the SA
+/// numbers contiguous from 1, remove a fighter with everything that belongs to it, and
+/// record every write.
 /// </summary>
 /// <remarks>
 /// Against a real PostgreSQL, because the parts being tested are the unique indexes, the stat
@@ -26,7 +26,7 @@ namespace Stanley.Data.Tests;
 [Trait("RequiresDocker", "true")]
 public class FighterAdminRepositoryTests(PostgresFixture postgres)
 {
-    /// <summary>The editor every write in these tests is attributed to (FR-15).</summary>
+    /// <summary>The editor every write in these tests is attributed to.</summary>
     private static readonly EditorContext Editor = new(ActorUserId: 777, GuildId: 99);
 
     /// <summary>Diamond and Dark: two of the rows the first migration seeds.</summary>
@@ -47,13 +47,13 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         string name = Unique("Heat Synced");
 
         FighterWriteResult added = await Fighters.AddAsync(
-            NewDraft(name, character.Name),
+            NewDraft(name, character.Name, quote: "Say hello to my little friend."),
             Editor);
 
         Assert.Equal(FighterWriteOutcome.Ok, added.Outcome);
         Assert.Equal(name, added.FighterName);
 
-        // FR-12: without restarting the bot, and through the same lookup /fighter uses.
+        // Without restarting the bot, and through the same lookup /fighter uses.
         FighterCard? card = await Lookup.FindCardAsync(name);
 
         Assert.NotNull(card);
@@ -63,7 +63,10 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         Assert.Equal(Element, card.ElementName);
         Assert.Equal(617, card.BaseAtk);
 
-        // Abilities come afterwards, one at a time (FR-13), so a new fighter has none.
+        // The card shows the quote, so the lookup has to read it.
+        Assert.Equal("Say hello to my little friend.", card.Quote);
+
+        // Abilities come afterwards, one at a time, so a new fighter has none.
         Assert.Empty(card.Abilities);
     }
 
@@ -87,7 +90,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         Assert.Equal(Editor.ActorUserId, record.ActorUserId);
         Assert.Equal(Editor.GuildId, record.GuildId);
 
-        // An insert has no "before": there was no row (FR-15).
+        // An insert has no "before": there was no row.
         Assert.Null(record.Before);
 
         JsonNode after = JsonNode.Parse(record.After!)!;
@@ -158,7 +161,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
             NewDraft(Unique("Unrooted"), character ?? existing.Name, rarity, element),
             Editor);
 
-        // FR-13: the refusal states the rule that was broken, which here is the list the value
+        // The refusal states the rule that was broken, which here is the list the value
         // had to come from.
         Assert.Equal(FighterWriteOutcome.ValueNotAllowed, refused.Outcome);
         Assert.Equal(expected, refused.Field);
@@ -245,7 +248,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
 
         Assert.Equal(FighterWriteOutcome.Ok, edited.Outcome);
 
-        // FR-13 and FRD section 6.1: the confirmation shows old and new values, and only for
+        // FRD section 6.1: the confirmation shows old and new values, and only for
         // what changed.
         FighterFieldChange attack = Assert.Single(
             edited.Changes,
@@ -285,12 +288,60 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         Assert.Equal(fighter.Name, edited.FighterName);
         Assert.Empty(edited.Changes);
 
-        // Nothing changed, so nothing was recorded either (FR-15).
+        // Nothing changed, so nothing was recorded either.
         await using StanleyDbContext db = postgres.CreateContext();
         string key = Key(fighter.Id);
 
         Assert.False(await db.ChangeRecords.AnyAsync(record =>
             record.EntityType == ChangeEntityType.Variant && record.EntityKey == key));
+    }
+
+    [Fact]
+    public async Task A_signature_ability_name_is_stored_in_capitals_however_it_was_typed()
+    {
+        Character character = await AddCharacterAsync();
+        string name = Unique("Heat Synced");
+
+        async Task<string> StoredSaNameAsync()
+        {
+            await using StanleyDbContext db = postgres.CreateContext();
+
+            return (await db.Variants
+                .AsNoTracking()
+                .SingleAsync(variant => variant.Name == name)).SaName;
+        }
+
+        // Typed in lower case and padded: the cards show SA names in capitals, so that is how
+        // they are kept and an editor is never asked to hold shift.
+        FighterWriteResult added = await Fighters.AddAsync(
+            NewDraft(name, character.Name, abilityName: "  riff wrath  "),
+            Editor);
+
+        Assert.Equal(FighterWriteOutcome.Ok, added.Outcome);
+        Assert.Equal("RIFF WRATH", await StoredSaNameAsync());
+
+        // An edit goes the same way, and the confirmation shows the value as it was stored
+        // rather than as it was typed.
+        FighterWriteResult edited = await Fighters.EditAsync(
+            name,
+            new FighterEdit(AbilityName: "ego strip"),
+            Editor);
+
+        FighterFieldChange change = Assert.Single(edited.Changes);
+
+        Assert.Equal(FighterField.AbilityName, change.Field);
+        Assert.Equal("RIFF WRATH", change.Before);
+        Assert.Equal("EGO STRIP", change.After);
+        Assert.Equal("EGO STRIP", await StoredSaNameAsync());
+
+        // And re-typing the stored name in lower case is not a change at all, so the same
+        // name does not fill the change log twice.
+        FighterWriteResult again = await Fighters.EditAsync(
+            name,
+            new FighterEdit(AbilityName: "ego strip"),
+            Editor);
+
+        Assert.Equal(FighterWriteOutcome.NothingToChange, again.Outcome);
     }
 
     [Fact]
@@ -313,15 +364,15 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         await using StanleyDbContext db = postgres.CreateContext();
         Variant stored = await db.Variants.SingleAsync(variant => variant.Id == fighter.Id);
 
-        // The slug is never set by hand, so a rename has to carry it (FR-02).
+        // The slug is never set by hand, so a rename has to carry it.
         Assert.Equal(NameNormalizer.Normalize(newName), stored.Slug);
 
         FighterCard? byNewName = await Lookup.FindCardAsync(newName);
         Assert.NotNull(byNewName);
         Assert.Equal(newName, byNewName.Name);
 
-        // The aliases belong to the fighter, not to the name it had (FR-14 removes them with
-        // the fighter; a rename keeps them).
+        // The aliases belong to the fighter, not to the name it had: a removal takes them
+        // with the fighter, and a rename keeps them.
         FighterCard? byAlias = await Lookup.FindCardAsync(alias);
         Assert.NotNull(byAlias);
         Assert.Equal(newName, byAlias.Name);
@@ -410,7 +461,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         Assert.Equal(FighterWriteOutcome.Ok, prompt.Outcome);
         Assert.Equal(1, prompt.Ordinal);
 
-        // FR-13: the form opens pre-filled with the current text, so an edit is an edit.
+        // The form opens pre-filled with the current text, so an edit is an edit.
         Assert.Equal("Test ability 1.", prompt.CurrentText);
     }
 
@@ -420,7 +471,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         Variant fighter = await AddFighterAsync();
 
         // SA4 for a fighter with two abilities would leave SA3 missing, and the numbers never
-        // have a gap (FR-13).
+        // have a gap.
         AbilityPrompt refused = await Fighters.PrepareAbilityAsync(fighter.Name, 4);
 
         Assert.Equal(FighterWriteOutcome.AbilityNumberOutOfRange, refused.Outcome);
@@ -503,7 +554,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
             new string('x', SignatureAbility.MaxTextLength + 1),
             Editor);
 
-        // FR-13: 1,024 characters, the most a Discord embed field shows. The column has the
+        // 1,024 characters, the most a Discord embed field shows. The column has the
         // same check, which would fail the command rather than refuse it politely.
         Assert.Equal(FighterWriteOutcome.AbilityTextTooLong, tooLong.Outcome);
 
@@ -530,7 +581,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         Variant stored = await db.Variants.SingleAsync(variant => variant.Id == fighter.Id);
         Assert.Equal("TEST ABILITY", stored.SaName);
 
-        // One record per row, because each row is what an undo would put back (FR-16).
+        // One record per row, because each row is what an undo would put back.
         foreach (short ordinal in new short[] { 1, 2 })
         {
             ChangeRecord record = await SingleRecordAsync(
@@ -611,7 +662,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         Assert.False(await db.VariantAliases.AnyAsync(row => row.VariantId == fighter.Id));
 
         // The fighter, both abilities and the alias are each recorded: a cascade leaves no
-        // trace of what it took, and FR-15 is what a developer reads to put it back.
+        // trace of what it took, and the change record is what a developer reads to put it back.
         ChangeRecord variantRecord = await SingleRecordAsync(
             db,
             ChangeEntityType.Variant,
@@ -659,7 +710,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         // Punctuation and spacing are absorbed by normalizing, so this still matches.
         Assert.NotNull(await Fighters.FindTargetAsync($"  {fighter.Name.ToUpperInvariant()}!  "));
 
-        // A typo does not. The fuzzy step of FR-02 is for reading, not for deciding which
+        // A typo does not. The fuzzy step is for reading, not for deciding which
         // fighter an edit or a removal lands on.
         string typo = fighter.Name.Replace("Fighter", "Fightr", StringComparison.Ordinal);
 
@@ -696,7 +747,7 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
 
     /// <summary>
     /// A character of this test's own. The editor commands never create one: a fighter is a
-    /// variant of a character that exists (FR-12).
+    /// variant of a character that exists.
     /// </summary>
     private async Task<Character> AddCharacterAsync()
     {
@@ -713,17 +764,20 @@ public class FighterAdminRepositoryTests(PostgresFixture postgres)
         string name,
         string character,
         string rarity = Rarity,
-        string element = Element) =>
+        string element = Element,
+        string? quote = null,
+        string abilityName = "TEST ABILITY") =>
         new(
             name,
             character,
             rarity,
             element,
-            "TEST ABILITY",
+            abilityName,
             BaseAtk: 617,
             BaseHp: 4169,
             BaseFs: 919,
-            PortraitUrl: "https://example.test/portrait.png");
+            PortraitUrl: "https://example.test/portrait.png",
+            Quote: quote);
 
     /// <summary>
     /// A suffix per name, because <c>variants.name</c>, <c>variants.slug</c>,

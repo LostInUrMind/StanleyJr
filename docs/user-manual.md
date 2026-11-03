@@ -41,6 +41,8 @@ nothing in the channel.
   have been uploaded to the bot, and text alone until then.
 - **The portrait**, as the card's thumbnail. Stanley links the image from the wiki; it hosts
   nothing itself, so a portrait can only be as good as the address an editor gave it.
+- **The quote**, in italics between quotation marks, above the abilities. Only fighters an
+  editor has given one show this line.
 - **The signature abilities**, one block each, named after the ability with its number —
   `RIFF WRATH (SA1)` — in order.
 - **STATS**, as two lines: `Min` is the fighter at level 1 in the rarity it comes in, `Max` is
@@ -54,12 +56,10 @@ titled `<name> (continued)`.
 
 ## Wiki links
 
-`/wiki` takes any fighter, and these pages that are not fighters:
-
-| Page | Also answers to |
-|---|---|
-| Critless Skill Tree | `critless` |
-| Fortune's Favor | — |
+`/wiki` takes any fighter, and also the wiki pages that are not fighters — the Critless Skill
+Tree and Fortune's Favor to begin with, and whatever else editors have added since. Those pages
+come first in the suggestions, so typing `/wiki` and leaving the box empty shows you the ones
+there are. A page you expect may simply not be there yet; ask an editor for it.
 
 A fighter's page is its name with underscores for spaces, so `Vintage Virtuoso` is at
 `/wiki/Vintage_Virtuoso`. A fighter whose wiki page is titled something else has the correct
@@ -83,7 +83,8 @@ Most answers are public, so the channel can read a card together. These are priv
 
 ## Something wrong in the data?
 
-Tell a wiki editor. They correct fighters, stats, abilities and aliases from inside Discord — no
+Tell a wiki editor. They correct fighters, stats, abilities, aliases and the wiki pages that
+are not fighters from inside Discord — no
 developer, no deploy, no restart — and the correction is on the next `/fighter` straight away.
 
 ## For server admins

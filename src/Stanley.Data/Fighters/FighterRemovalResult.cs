@@ -1,12 +1,12 @@
 namespace Stanley.Data.Fighters;
 
 /// <summary>
-/// The outcome of removing a fighter (FR-14).
+/// The outcome of removing a fighter.
 /// </summary>
 /// <remarks>
 /// The counts are reported because the editor confirmed removing more than one row: a
 /// fighter's abilities and its aliases go with it, each recorded so a developer can put them
-/// back (FR-15).
+/// back.
 /// </remarks>
 /// <param name="Outcome">What happened.</param>
 /// <param name="FighterName">The fighter that was removed.</param>

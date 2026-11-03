@@ -1,7 +1,7 @@
 namespace Stanley.Data.Lookup;
 
 /// <summary>
-/// What <c>/wiki</c> needs about a fighter: the two columns its URL depends on (FR-07).
+/// What <c>/wiki</c> needs about a fighter: the two columns its URL depends on.
 /// </summary>
 /// <param name="Name">The display name the URL is built from.</param>
 /// <param name="StoredUrl">

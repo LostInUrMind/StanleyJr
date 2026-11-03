@@ -328,7 +328,7 @@ namespace Stanley.Data.Migrations
                 """);
 
             // Every variant name and every alias in one place, read by the tolerant match
-            // (FR-02) and by autocomplete (FR-03). Raid Bosses are included: the exclusion
+            // and by autocomplete. Raid Bosses are included: the exclusion
             // above is about counting, not about lookup.
             migrationBuilder.Sql("""
                 CREATE VIEW searchable_names AS

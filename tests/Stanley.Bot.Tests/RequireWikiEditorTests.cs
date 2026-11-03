@@ -62,7 +62,7 @@ public class RequireWikiEditorTests
         ulong? homeGuildId,
         ulong? editorRoleId)
     {
-        // Fails closed. This is the state until FR-17 settles who an editor is, and it must
+        // Fails closed. This is the state until who counts as an editor is settled, and it must
         // refuse rather than let the first caller through.
         var options = new DiscordOptions
         {

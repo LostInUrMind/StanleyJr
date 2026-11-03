@@ -13,6 +13,7 @@ namespace Stanley.Data.Lookup;
 public sealed record FighterCard(
     string Name,
     string Slug,
+    string? Quote,
     string TierName,
     string ElementName,
     string ElementColorHex,
@@ -28,6 +29,6 @@ public sealed record FighterCard(
 
 /// <summary>
 /// One signature ability, already in SA order. Playable fighters have two; Raid Bosses can
-/// have more, and every one of them is shown (FR-04).
+/// have more, and every one of them is shown.
 /// </summary>
 public sealed record FighterAbility(short Ordinal, string Text);

@@ -5,10 +5,10 @@ using Stanley.Data.Entities;
 namespace Stanley.Core.Tests;
 
 /// <summary>
-/// The proof that the migration did not change what Stanley shows (FR-06).
+/// The proof that the migration did not change what Stanley shows.
 /// </summary>
 /// <remarks>
-/// FR-06's acceptance criterion is "an automated test compares v2's results with v1's for all
+/// The acceptance criterion is "an automated test compares v2's results with v1's for all
 /// 309 fighters and finds no difference". That is <see cref="Matches_v1_for_every_fighter"/>;
 /// the rest guard the pieces it depends on.
 /// </remarks>

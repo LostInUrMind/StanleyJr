@@ -1,6 +1,6 @@
 name: CI
 
-# Every pull request is built and tested (NFR-07).
+# Every pull request is built and tested.
 on:
   push:
     branches: [main]

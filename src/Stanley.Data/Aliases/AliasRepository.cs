@@ -9,14 +9,14 @@ using Stanley.Data.Lookup;
 namespace Stanley.Data.Aliases;
 
 /// <summary>
-/// The alternative names players use for a fighter: listing them (FR-09), adding one (FR-10)
-/// and removing one (FR-11).
+/// The alternative names players use for a fighter: listing them, adding one
+/// and removing one.
 /// </summary>
 public sealed class AliasRepository(IDbContextFactory<StanleyDbContext> contextFactory)
 {
     /// <summary>
     /// The aliases of the fighter <paramref name="fighter"/> names, or null when it names no
-    /// fighter (FR-09).
+    /// fighter.
     /// </summary>
     public async Task<AliasListing?> ListAsync(
         string? fighter,
@@ -55,7 +55,7 @@ public sealed class AliasRepository(IDbContextFactory<StanleyDbContext> contextF
 
     /// <summary>
     /// Adds <paramref name="alias"/> as another name for the fighter <paramref name="fighter"/>
-    /// names (FR-10).
+    /// names.
     /// </summary>
     public async Task<AliasAddResult> AddAsync(
         string? fighter,
@@ -142,8 +142,7 @@ public sealed class AliasRepository(IDbContextFactory<StanleyDbContext> contextF
     }
 
     /// <summary>
-    /// Removes the alias <paramref name="alias"/> names, or returns null when no alias matches
-    /// (FR-11).
+    /// Removes the alias <paramref name="alias"/> names, or returns null when no alias matches.
     /// </summary>
     public async Task<RemovedAlias?> RemoveAsync(
         string? alias,
@@ -171,8 +170,8 @@ public sealed class AliasRepository(IDbContextFactory<StanleyDbContext> contextF
 
         var removed = new RemovedAlias(row.Alias, row.Variant.Name);
 
-        // Taken before the delete: afterwards the change record holds the only copy of the row
-        // (FR-15), and it is what an undo would restore (FR-16).
+        // Taken before the delete: afterwards the change record holds the only copy of the
+        // row, and it is what an undo would restore.
         AliasSnapshot before = AliasSnapshot.Of(row);
 
         db.VariantAliases.Remove(row);

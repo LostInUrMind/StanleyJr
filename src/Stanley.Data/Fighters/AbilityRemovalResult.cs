@@ -1,7 +1,7 @@
 namespace Stanley.Data.Fighters;
 
 /// <summary>
-/// The outcome of removing a fighter's whole ability block (FR-13).
+/// The outcome of removing a fighter's whole ability block.
 /// </summary>
 /// <param name="Outcome">What happened.</param>
 /// <param name="FighterName">The fighter whose block it was.</param>

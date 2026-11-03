@@ -2,7 +2,7 @@ namespace Stanley.Data.Fighters;
 
 /// <summary>
 /// The fields an editor is changing on a fighter that already exists: only the ones given are
-/// touched (FR-13).
+/// touched.
 /// </summary>
 /// <remarks>
 /// <para>

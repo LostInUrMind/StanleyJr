@@ -16,7 +16,7 @@ namespace Stanley.Bot.Modules;
 /// </remarks>
 public abstract class SuggestionAutocompleteHandler : AutocompleteHandler
 {
-    /// <summary>The most choices Discord will show (FR-03).</summary>
+    /// <summary>The most choices Discord will show.</summary>
     private const int MaxChoices = 25;
 
     public sealed override async Task<AutocompletionResult> GenerateSuggestionsAsync(

@@ -14,6 +14,7 @@ using Stanley.Data;
 using Stanley.Data.Aliases;
 using Stanley.Data.Fighters;
 using Stanley.Data.Lookup;
+using Stanley.Data.Wiki;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
 {
@@ -22,7 +23,7 @@ HostApplicationBuilder builder = Host.CreateApplicationBuilder(new HostApplicati
 });
 
 // Configuration comes from appsettings.json, then the environment (Discord__Token), then user
-// secrets in development. Nothing secret is ever read from the repository (NFR-06).
+// secrets in development. Nothing secret is ever read from the repository.
 builder.Configuration.AddInMemoryCollection(
     GuildIdListConfiguration.ExpandCommaSeparated(
         builder.Configuration,
@@ -39,7 +40,7 @@ builder.Services
     .Bind(builder.Configuration.GetSection(DatabaseOptions.SectionName));
 
 // Card emoji. Not validated: every one of them is optional, and a card falls back to text for
-// any that is missing (FR-23).
+// any that is missing.
 builder.Services
     .AddOptions<PresentationOptions>()
     .Bind(builder.Configuration.GetSection(PresentationOptions.SectionName));
@@ -59,7 +60,7 @@ string connectionString =
 builder.Services.AddPooledDbContextFactory<StanleyDbContext>(
     options => StanleyDbContextOptions.Configure(options, connectionString));
 
-// Discord.Net wiring. Stanley asks for no privileged intents (NFR-02): slash commands arrive
+// Discord.Net wiring. Stanley asks for no privileged intents: slash commands arrive
 // as interactions, and the Guilds intent is not privileged.
 builder.Services.AddSingleton(new DiscordSocketConfig
 {
@@ -84,6 +85,7 @@ builder.Services.AddSingleton<InteractionHandler>();
 builder.Services.AddSingleton<FighterLookup>();
 builder.Services.AddSingleton<AliasRepository>();
 builder.Services.AddSingleton<FighterAdminRepository>();
+builder.Services.AddSingleton<WikiPageRepository>();
 builder.Services.AddSingleton<FighterPresentation>();
 builder.Services.AddSingleton<FighterCardBuilder>();
 

@@ -10,8 +10,8 @@ using Stanley.Data.Lookup;
 namespace Stanley.Data.Tests;
 
 /// <summary>
-/// What <c>/alias</c> must do: list a fighter's other names (FR-09), add one under the rules
-/// the database cannot state (FR-10), remove one (FR-11), and record every write (FR-15).
+/// What <c>/alias</c> must do: list a fighter's other names, add one under the rules
+/// the database cannot state, remove one, and record every write.
 /// </summary>
 /// <remarks>
 /// Against a real PostgreSQL, because the parts being tested are the trigram match, the unique
@@ -22,7 +22,7 @@ namespace Stanley.Data.Tests;
 [Trait("RequiresDocker", "true")]
 public class AliasRepositoryTests(PostgresFixture postgres)
 {
-    /// <summary>The editor every write in these tests is attributed to (FR-15).</summary>
+    /// <summary>The editor every write in these tests is attributed to.</summary>
     private static readonly EditorContext Editor = new(ActorUserId: 4242, GuildId: 99);
 
     private AliasRepository Aliases => new(new TestContextFactory(postgres));
@@ -86,7 +86,7 @@ public class AliasRepositoryTests(PostgresFixture postgres)
         await Aliases.AddAsync(fighter.Name, known, Editor);
 
         // The fighter option goes through the same tolerant match as /fighter, whose second
-        // step is an alias (FR-02), so an editor can name the fighter by one of its aliases.
+        // step is an alias, so an editor can name the fighter by one of its aliases.
         AliasAddResult added = await Aliases.AddAsync(known, second, Editor);
 
         Assert.Equal(AliasAddOutcome.Added, added.Outcome);
@@ -188,7 +188,7 @@ public class AliasRepositoryTests(PostgresFixture postgres)
         Assert.Equal(Editor.ActorUserId, record.ActorUserId);
         Assert.Equal(Editor.GuildId, record.GuildId);
 
-        // An insert has no "before": there was no row (FR-15).
+        // An insert has no "before": there was no row.
         Assert.Null(record.Before);
 
         JsonNode after = JsonNode.Parse(record.After!)!;
@@ -224,7 +224,7 @@ public class AliasRepositoryTests(PostgresFixture postgres)
         await Aliases.AddAsync(fighter.Name, alias, Editor);
 
         // Matched on alias_slug, so the spacing and punctuation of the input do not have to
-        // match the stored text (FR-02).
+        // match the stored text.
         RemovedAlias? removed = await Aliases.RemoveAsync(alias.Replace(".", string.Empty), Editor);
 
         Assert.NotNull(removed);
@@ -248,7 +248,7 @@ public class AliasRepositoryTests(PostgresFixture postgres)
         await Aliases.RemoveAsync(alias, Editor);
 
         // Two records now share the key: the insert and the delete. The delete is the later
-        // one, and it is the only copy of the row that is left (FR-15).
+        // one, and it is the only copy of the row that is left.
         string key = aliasId.ToString(CultureInfo.InvariantCulture);
 
         ChangeRecord record = await db.ChangeRecords
@@ -301,7 +301,7 @@ public class AliasRepositoryTests(PostgresFixture postgres)
     public async Task Suggestions_never_exceed_what_Discord_shows()
     {
         // An empty box offers the first aliases alphabetically rather than nothing, and never
-        // more than the 25 choices Discord shows (FR-03).
+        // more than the 25 choices Discord shows.
         IReadOnlyList<AliasSuggestion> suggestions = await Aliases.SuggestAsync(string.Empty);
 
         Assert.True(suggestions.Count <= FighterLookup.MaxSuggestions);

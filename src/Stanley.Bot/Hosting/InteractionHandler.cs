@@ -12,9 +12,9 @@ namespace Stanley.Bot.Hosting;
 /// Finds the command modules and runs the right one for each interaction.
 /// </summary>
 /// <remarks>
-/// A new command is a method on a module in <c>Modules/</c>; nothing here changes
-/// (NFR-07). Handlers are deliberately thin: the logic they call lives in Stanley.Core so it
-/// can be tested without Discord.
+/// A new command is a method on a module in <c>Modules/</c>; nothing here changes.
+/// Handlers are deliberately thin: the logic they call lives in Stanley.Core so it can be
+/// tested without Discord.
 /// </remarks>
 internal sealed class InteractionHandler(
     DiscordSocketClient client,

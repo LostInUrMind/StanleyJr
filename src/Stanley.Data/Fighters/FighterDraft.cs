@@ -1,8 +1,8 @@
 namespace Stanley.Data.Fighters;
 
 /// <summary>
-/// The fighter an editor is adding: exactly the values FR-12 asks for. Its signature abilities
-/// are added afterwards, one at a time (FR-13).
+/// The fighter an editor is adding: exactly the values the add command asks for. Its
+/// signature abilities are added afterwards, one at a time.
 /// </summary>
 /// <remarks>
 /// <see cref="Character"/>, <see cref="Rarity"/> and <see cref="Element"/> are names, matched

@@ -1,7 +1,7 @@
 namespace Stanley.Data.Fighters;
 
 /// <summary>
-/// What an editor write did, or the rule that refused it (FR-12 to FR-14). Shared by every
+/// What an editor write did, or the rule that refused it. Shared by every
 /// result type in this folder, so one refusal is decided in one place however it was reached.
 /// </summary>
 public enum FighterWriteOutcome
@@ -12,18 +12,18 @@ public enum FighterWriteOutcome
     /// </summary>
     Ok,
 
-    /// <summary>The <c>fighter</c> option matched no fighter (FR-05).</summary>
+    /// <summary>The <c>fighter</c> option matched no fighter.</summary>
     FighterNotFound,
 
     /// <summary>
     /// The name normalizes to nothing — punctuation or symbols alone — so no lookup could ever
-    /// find the fighter again (FR-02).
+    /// find the fighter again.
     /// </summary>
     NameNotUsable,
 
     /// <summary>
     /// The name is already a fighter's name or an alias, so the write is refused naming what
-    /// uses it (database design section 3.2, the rule FR-10 states for aliases).
+    /// uses it (database design section 3.2, the same rule aliases follow).
     /// </summary>
     NameTaken,
 
@@ -35,7 +35,7 @@ public enum FighterWriteOutcome
     /// </summary>
     ValueNotAllowed,
 
-    /// <summary>A stat was zero or negative. Stats are whole numbers above zero (FR-13).</summary>
+    /// <summary>A stat was zero or negative. Stats are whole numbers above zero.</summary>
     ValueNotPositive,
 
     /// <summary>A URL option was not an absolute <c>http</c> or <c>https</c> address.</summary>
@@ -52,7 +52,7 @@ public enum FighterWriteOutcome
     /// </summary>
     AbilityNumberOutOfRange,
 
-    /// <summary>The ability text is longer than a Discord embed field shows (FR-13).</summary>
+    /// <summary>The ability text is longer than a Discord embed field shows.</summary>
     AbilityTextTooLong,
 
     /// <summary>There is no ability block to remove.</summary>
@@ -61,7 +61,7 @@ public enum FighterWriteOutcome
 
 /// <summary>
 /// The outcome of <c>/fighter-admin add</c> or <c>/fighter-admin edit</c>, with whatever the
-/// private confirmation has to show (FR-12, FR-13).
+/// private confirmation has to show.
 /// </summary>
 /// <param name="Outcome">What happened.</param>
 /// <param name="FighterName">
@@ -77,8 +77,8 @@ public enum FighterWriteOutcome
 /// character, rarity or element that matched no row. Null when the outcome needs no value.
 /// </param>
 /// <param name="Changes">
-/// The fields an edit actually changed, old and new, which FR-13 requires the confirmation to
-/// show. Empty for every other outcome.
+/// The fields an edit actually changed, old and new, which the confirmation has to show.
+/// Empty for every other outcome.
 /// </param>
 public sealed record FighterWriteResult(
     FighterWriteOutcome Outcome,

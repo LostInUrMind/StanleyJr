@@ -2,7 +2,7 @@ namespace Stanley.Data.Fighters;
 
 /// <summary>
 /// What the pop-up form for one signature ability needs to be opened: which ability it is, and
-/// the text to pre-fill when that ability already exists (FR-13).
+/// the text to pre-fill when that ability already exists.
 /// </summary>
 /// <remarks>
 /// One ability per form, because a Discord form holds at most five components and a Raid Boss

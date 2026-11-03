@@ -2,7 +2,7 @@ namespace Stanley.Data.Fighters;
 
 /// <summary>
 /// The outcome of writing one signature ability, which is what the form's private confirmation
-/// reports (FR-13).
+/// reports.
 /// </summary>
 /// <param name="Outcome">What happened.</param>
 /// <param name="FighterName">

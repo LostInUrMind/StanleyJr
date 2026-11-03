@@ -2,7 +2,7 @@ namespace Stanley.Data.Changes;
 
 /// <summary>
 /// Who ran a write command and where, which is the half of a change record that is not the
-/// data itself (FR-15).
+/// data itself.
 /// </summary>
 /// <param name="ActorUserId">
 /// The editor's Discord ID. Nullable because it is cleared on request while the change itself

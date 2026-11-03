@@ -26,7 +26,7 @@ internal static class ChangeEnumConverters
 
     /// <summary>The allowed <c>entity_type</c> values, for the CHECK constraint.</summary>
     public static IReadOnlyList<string> EntityTypeValues { get; } =
-        ["character", "variant", "signature_ability", "variant_alias"];
+        ["character", "variant", "signature_ability", "variant_alias", "wiki_page"];
 
     private static string ToDatabase(ChangeAction action) => action switch
     {
@@ -50,6 +50,7 @@ internal static class ChangeEnumConverters
         ChangeEntityType.Variant => "variant",
         ChangeEntityType.SignatureAbility => "signature_ability",
         ChangeEntityType.VariantAlias => "variant_alias",
+        ChangeEntityType.WikiPage => "wiki_page",
         _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
     };
 
@@ -59,6 +60,7 @@ internal static class ChangeEnumConverters
         "variant" => ChangeEntityType.Variant,
         "signature_ability" => ChangeEntityType.SignatureAbility,
         "variant_alias" => ChangeEntityType.VariantAlias,
+        "wiki_page" => ChangeEntityType.WikiPage,
         _ => throw new ArgumentOutOfRangeException(nameof(value), value, null),
     };
 }

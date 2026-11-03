@@ -138,7 +138,7 @@ public class SchemaTests(PostgresFixture postgres)
         variant.BaseFs = fs;
         db.Variants.Add(variant);
 
-        // FR-13: stats must be whole numbers greater than zero.
+        // Stats must be whole numbers greater than zero.
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
     }
 
@@ -228,7 +228,7 @@ public class SchemaTests(PostgresFixture postgres)
         db.Variants.Remove(variant);
         await db.SaveChangesAsync();
 
-        // FR-14: the fighter's aliases are removed with it, and so are its abilities.
+        // The fighter's aliases are removed with it, and so are its abilities.
         Assert.Equal(0, await db.SignatureAbilities.CountAsync(a => a.VariantId == variantId));
         Assert.Equal(0, await db.VariantAliases.CountAsync(a => a.VariantId == variantId));
     }
@@ -266,7 +266,7 @@ public class SchemaTests(PostgresFixture postgres)
 
         db.VariantAliases.Add(TestFighters.NewAlias(second, alias));
 
-        // FR-10: alias_slug is unique, so a duplicate cannot reach the table.
+        // alias_slug is unique, so a duplicate cannot reach the table.
         await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
     }
 
@@ -333,7 +333,7 @@ public class SchemaTests(PostgresFixture postgres)
         db.ChangeRecords.Add(record);
         await db.SaveChangesAsync();
 
-        // CR-02: a removal request clears the person, and the game data stays.
+        // A removal request clears the person, and the game data stays.
         record.ActorUserId = null;
         record.GuildId = null;
         await db.SaveChangesAsync();
@@ -369,6 +369,91 @@ public class SchemaTests(PostgresFixture postgres)
 
         Assert.True(variant.UpdatedAt >= created);
         Assert.Equal(DateTimeKind.Utc, variant.UpdatedAt.Kind);
+    }
+
+    [Fact]
+    public async Task The_migration_seeds_the_wiki_pages_that_were_hardcoded()
+    {
+        // The acceptance criterion that used to be a list in Stanley.Core: both pages, under
+        // every name v1 answered to. Looked up by slug, because that is how /wiki finds them.
+        await using StanleyDbContext db = postgres.CreateContext();
+
+        Dictionary<string, string> seeded = await db.WikiPages
+            .Where(page => page.KeySlug == "critlessskilltree"
+                || page.KeySlug == "critless"
+                || page.KeySlug == "fortunesfavor")
+            .ToDictionaryAsync(page => page.KeySlug, page => page.Url);
+
+        const string critless = "https://skullgirlsmobile.fandom.com/wiki/Critless_Skill_Tree";
+
+        Assert.Equal(critless, seeded["critlessskilltree"]);
+        Assert.Equal(critless, seeded["critless"]);
+        Assert.Equal(
+            "https://skullgirlsmobile.fandom.com/wiki/Fortune's_Favor",
+            seeded["fortunesfavor"]);
+    }
+
+    [Fact]
+    public async Task The_same_wiki_page_key_cannot_be_added_twice()
+    {
+        await using StanleyDbContext db = postgres.CreateContext();
+
+        string slug = $"dup{Guid.NewGuid():N}";
+
+        db.WikiPages.Add(new WikiPage
+        {
+            Key = slug,
+            KeySlug = slug,
+            Url = "https://example.com/first",
+        });
+        await db.SaveChangesAsync();
+
+        db.WikiPages.Add(new WikiPage
+        {
+            Key = slug.ToUpperInvariant(),
+            KeySlug = slug,
+            Url = "https://example.com/second",
+        });
+
+        // key_slug is unique, so a second page under one key cannot reach the table.
+        await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
+    }
+
+    [Fact]
+    public async Task A_change_record_can_describe_a_wiki_page()
+    {
+        await using StanleyDbContext db = postgres.CreateContext();
+
+        var record = new ChangeRecord
+        {
+            ActorUserId = 123456789012345678,
+            Action = ChangeAction.Insert,
+            EntityType = ChangeEntityType.WikiPage,
+            EntityKey = "11",
+            After = """{"key":"critless"}""",
+        };
+
+        db.ChangeRecords.Add(record);
+
+        // The entity_type CHECK constraint has to have been widened by the migration, or
+        // every /wiki-admin write would fail on its own record.
+        await db.SaveChangesAsync();
+
+        await using StanleyDbContext second = postgres.CreateContext();
+        ChangeRecord stored = await second.ChangeRecords.SingleAsync(r => r.Id == record.Id);
+
+        Assert.Equal(ChangeEntityType.WikiPage, stored.EntityType);
+    }
+
+    [Fact]
+    public async Task A_change_record_of_an_unknown_entity_type_is_still_refused()
+    {
+        await using StanleyDbContext db = postgres.CreateContext();
+
+        // Raw SQL, because the value converter cannot produce a string outside the list. What
+        // is being checked is that the widened constraint is still a constraint.
+        await Assert.ThrowsAnyAsync<Exception>(() => db.Database.ExecuteSqlAsync(
+            $"INSERT INTO change_records (action, entity_type, entity_key) VALUES ('insert', 'wiki_pages', '1')"));
     }
 
     private static async Task<long> TierCountAsync(StanleyDbContext db, short tierId) =>

@@ -83,7 +83,7 @@ namespace Stanley.Data.Migrations
                         {
                             t.HasCheckConstraint("ck_change_records_action", "action IN ('insert','update','delete')");
 
-                            t.HasCheckConstraint("ck_change_records_entity_type", "entity_type IN ('character','variant','signature_ability','variant_alias')");
+                            t.HasCheckConstraint("ck_change_records_entity_type", "entity_type IN ('character','variant','signature_ability','variant_alias','wiki_page')");
                         });
                 });
 
@@ -526,6 +526,62 @@ namespace Stanley.Data.Migrations
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Alias" }, "ix_aliases_trgm"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("variant_aliases", (string)null);
+                });
+
+            modelBuilder.Entity("Stanley.Data.Entities.WikiPage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<long?>("CreatedByUserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("created_by_user_id");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("key");
+
+                    b.Property<string>("KeySlug")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("key_slug");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("url");
+
+                    b.HasKey("Id")
+                        .HasName("pk_wiki_pages");
+
+                    b.HasIndex("KeySlug")
+                        .IsUnique()
+                        .HasDatabaseName("ix_wiki_pages_key_slug");
+
+                    b.HasIndex(new[] { "Key" }, "ix_wiki_pages_trgm")
+                        .HasDatabaseName("ix_wiki_pages_trgm");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Key" }, "ix_wiki_pages_trgm"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Key" }, "ix_wiki_pages_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.ToTable("wiki_pages", (string)null);
                 });
 
             modelBuilder.Entity("Stanley.Data.Views.ElementVariantCount", b =>

@@ -6,7 +6,7 @@ using Stanley.Data.Lookup;
 namespace Stanley.Bot.Modules;
 
 /// <summary>
-/// <c>/fighter</c>: the fighter card (FR-01 to FR-06, FR-26).
+/// <c>/fighter</c>: the fighter card.
 /// </summary>
 /// <remarks>
 /// A thin handler, as every module is: the matching lives in <see cref="FighterLookup"/> and

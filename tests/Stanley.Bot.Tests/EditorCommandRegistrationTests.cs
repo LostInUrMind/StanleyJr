@@ -51,9 +51,9 @@ public class EditorCommandRegistrationTests
     }
 
     [Fact]
-    public void The_editor_commands_are_the_two_admin_commands()
+    public void The_editor_commands_are_the_three_admin_commands()
     {
-        // Named rather than counted, so adding a third is a decision and not a surprise.
+        // Named rather than counted, so adding a fourth is a decision and not a surprise.
         string[] groups =
         [
             .. Modules()
@@ -62,7 +62,7 @@ public class EditorCommandRegistrationTests
                 .Order(StringComparer.Ordinal),
         ];
 
-        Assert.Equal(["alias-admin", "fighter-admin"], groups);
+        Assert.Equal(["alias-admin", "fighter-admin", "wiki-admin"], groups);
     }
 
     /// <summary>Every command module in the bot.</summary>

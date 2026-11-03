@@ -1,6 +1,6 @@
 """Regenerate the maximum-stat golden fixture from v1's own formula.
 
-FR-06 requires v2's maximum stats to equal v1's for all 309 fighters. This script runs the
+v2's maximum stats must equal v1's for all 309 fighters. This script runs the
 Python formula from v1's bot_ver2.py over v1's fighters.json and writes the result as the
 fixture the C# golden test asserts against, so the proof does not depend on v1 still running.
 

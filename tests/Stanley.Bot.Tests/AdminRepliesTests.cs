@@ -1,11 +1,12 @@
 using Stanley.Bot.Presentation;
 using Stanley.Data.Fighters;
+using Stanley.Data.Wiki;
 
 namespace Stanley.Bot.Tests;
 
 /// <summary>
-/// What the editor commands say: FR-13 requires a refused write to state the rule it broke, and
-/// a confirmed edit to show the old and new values.
+/// What the editor commands say: a refused write has to state the rule it broke, and a
+/// confirmed edit the old and new values.
 /// </summary>
 public class AdminRepliesTests
 {
@@ -65,7 +66,7 @@ public class AdminRepliesTests
     [Fact]
     public void A_refused_name_names_the_fighter_that_already_answers_to_it()
     {
-        // FR-10 words this for aliases, and a fighter's own name follows the same rule.
+        // The FRD words this for aliases, and a fighter's own name follows the same rule.
         string reply = AdminReplies.FighterAdded(
             FighterWriteResult.NameTaken("Heat", "Heat Synced"),
             "Heat");
@@ -100,7 +101,7 @@ public class AdminRepliesTests
     [Fact]
     public void A_fighter_that_matched_nothing_gets_the_same_reply_as_a_lookup()
     {
-        // FR-05 words this once, and an editor typing a name that matches nothing is in the
+        // The FRD words this once, and an editor typing a name that matches nothing is in the
         // same position as anyone else.
         Assert.Equal(
             Replies.NoMatch("nosuchfighter"),
@@ -114,7 +115,7 @@ public class AdminRepliesTests
             AbilityPrompt.OutOfRange("Heat Synced", 2),
             "heat synced");
 
-        // FR-13: abilities are added at the end, so SA1 to SA3 for a fighter that has two.
+        // Abilities are added at the end, so SA1 to SA3 for a fighter that has two.
         Assert.Contains("between 1 and 3", reply, StringComparison.Ordinal);
     }
 
@@ -136,7 +137,7 @@ public class AdminRepliesTests
     [Fact]
     public void A_removal_is_confirmed_with_what_goes_with_the_fighter()
     {
-        // FR-14: the aliases go with the fighter, so the question says so before anything does.
+        // The aliases go with the fighter, so the question says so before anything does.
         string one = AdminReplies.ConfirmRemoveFighter(
             new FighterTarget(1, "Heat Synced", AbilityCount: 1, AliasCount: 1));
 
@@ -154,7 +155,7 @@ public class AdminRepliesTests
     public void Removing_abilities_says_they_are_entered_again_from_the_first()
     {
         // The all-or-nothing rule is the surprising part, so both the question and the
-        // confirmation say it (FR-13).
+        // confirmation say it.
         Assert.Contains(
             "SA1",
             AdminReplies.ConfirmRemoveAbilities(new FighterTarget(1, "Doomsayer", 5, 0)),
@@ -164,5 +165,123 @@ public class AdminRepliesTests
             "SA1",
             AdminReplies.AbilitiesRemoved(AbilityRemovalResult.Removed("Doomsayer", 5)),
             StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_confirmed_wiki_page_names_the_key_and_the_address()
+    {
+        string reply = AdminReplies.WikiPageAdded(
+            WikiPageWriteResult.Added("critless", "https://example.com/wiki/Critless"),
+            "critless");
+
+        Assert.Contains("critless", reply, StringComparison.Ordinal);
+        Assert.Contains("https://example.com/wiki/Critless", reply, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_wiki_page_key_that_finds_a_fighter_is_refused_naming_the_fighter()
+    {
+        // Pages resolve before fighters, so the refusal has to say what would be hidden.
+        string reply = AdminReplies.WikiPageAdded(
+            WikiPageWriteResult.KeyFindsFighter("Heat Synced", "Heat Synced"),
+            "Heat Synced");
+
+        Assert.Contains("Heat Synced", reply, StringComparison.Ordinal);
+        Assert.Contains("hide it", reply, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_wiki_page_key_another_page_holds_is_refused_naming_that_page()
+    {
+        string reply = AdminReplies.WikiPageAdded(
+            WikiPageWriteResult.KeyTaken("CRITLESS", "critless"),
+            "CRITLESS");
+
+        Assert.Contains("critless", reply, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_wiki_page_key_with_no_letters_or_digits_says_why_it_cannot_work()
+    {
+        string reply = AdminReplies.WikiPageAdded(
+            WikiPageWriteResult.KeyNotUsable("???"),
+            "???");
+
+        Assert.Contains("letters or digits", reply, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_wiki_page_address_that_is_not_a_url_names_what_was_given()
+    {
+        string reply = AdminReplies.WikiPageAdded(
+            WikiPageWriteResult.NotAUrl("fandom.com/wiki/Critless"),
+            "critless");
+
+        Assert.Contains("https://", reply, StringComparison.Ordinal);
+        Assert.Contains("fandom.com/wiki/Critless", reply, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_blank_wiki_page_address_names_the_option_it_is_about()
+    {
+        Assert.Contains(
+            "address",
+            AdminReplies.WikiPageAdded(WikiPageWriteResult.UrlMissing(), "critless"),
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_confirmed_wiki_page_edit_shows_the_old_and_new_value_of_each_field()
+    {
+        string reply = AdminReplies.WikiPageEdited(
+            WikiPageWriteResult.Edited(
+                "critless",
+                "https://example.com/b",
+                [
+                    new WikiPageFieldChange(WikiPageField.Key, "crit", "critless"),
+                    new WikiPageFieldChange(
+                        WikiPageField.Url,
+                        "https://example.com/a",
+                        "https://example.com/b"),
+                ]),
+            "crit");
+
+        Assert.Contains("critless", reply, StringComparison.Ordinal);
+        Assert.Contains("key: crit → critless", reply, StringComparison.Ordinal);
+        Assert.Contains(
+            "address: https://example.com/a → https://example.com/b",
+            reply,
+            StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void An_edit_that_gave_nothing_says_what_to_give()
+    {
+        string reply = AdminReplies.WikiPageEdited(
+            WikiPageWriteResult.NothingGiven(),
+            "critless");
+
+        Assert.Contains("key", reply, StringComparison.Ordinal);
+        Assert.Contains("address", reply, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_removed_wiki_page_names_what_went()
+    {
+        string reply = AdminReplies.WikiPageRemoved(
+            new RemovedWikiPage("critless", "https://example.com/wiki/Critless"));
+
+        Assert.Contains("critless", reply, StringComparison.Ordinal);
+        Assert.Contains("https://example.com/wiki/Critless", reply, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_wiki_page_that_does_not_exist_is_not_reported_as_a_missing_fighter()
+    {
+        // /wiki-admin takes a page, not a fighter, so the fighter wording would mislead.
+        string reply = AdminReplies.NoWikiPageMatch("critles");
+
+        Assert.Contains("No wiki page matches", reply, StringComparison.Ordinal);
+        Assert.DoesNotContain("fighter", reply, StringComparison.Ordinal);
     }
 }

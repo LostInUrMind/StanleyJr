@@ -1,4 +1,4 @@
-using Discord;
+﻿using Discord;
 using Stanley.Data.Lookup;
 
 namespace Stanley.Bot.Presentation;
@@ -10,7 +10,7 @@ public sealed record FighterCardMessage(string? Text, Embed Embed);
 
 /// <summary>
 /// Builds the fighter card (FRD Appendix A) and splits it when it outgrows what Discord will
-/// accept in one message (FR-26).
+/// accept in one message.
 /// </summary>
 /// <remarks>
 /// Nothing here touches Discord or the database.
@@ -31,6 +31,16 @@ public sealed class FighterCardBuilder(FighterPresentation presentation)
     /// </summary>
     private const int MaxFieldValueLength = 1024;
 
+    /// <summary>The most an embed description displays.</summary>
+    private const int MaxDescriptionLength = 4096;
+
+    /// <summary>
+    /// The longest stored quote the card will show. Halved against the description limit
+    /// because sanitising can at most double the text, and four characters go to the
+    /// quotation marks and the italics.
+    /// </summary>
+    private const int MaxQuoteLength = (MaxDescriptionLength - 4) / 2;
+
     private const string StatsFieldName = "STATS";
 
     /// <summary>
@@ -44,6 +54,10 @@ public sealed class FighterCardBuilder(FighterPresentation presentation)
         Color color = FighterPresentation.ElementColor(card.ElementColorHex);
         string statsValue = presentation.StatsBlock(card);
 
+        // Above the ability fields, which is where the description sits in an embed.
+        string? quote = FighterPresentation.QuoteLine(
+            card.Quote is null ? null : Truncate(card.Quote, MaxQuoteLength));
+
         var abilities = new Queue<AbilityField>(card.Abilities.Select(ability => new AbilityField(
             Truncate(FighterPresentation.AbilityTitle(card, ability), MaxFieldNameLength),
             Truncate(ability.Text, MaxFieldValueLength))));
@@ -54,12 +68,20 @@ public sealed class FighterCardBuilder(FighterPresentation presentation)
             .WithTitle(title)
             .WithColor(color);
 
+        if (quote is not null)
+        {
+            first.WithDescription(quote);
+        }
+
         if (IsDisplayableUrl(card.ImageUrl))
         {
             first.WithThumbnailUrl(card.ImageUrl);
         }
 
-        int reserved = title.Length + StatsFieldName.Length + statsValue.Length;
+        int reserved = title.Length
+            + (quote?.Length ?? 0)
+            + StatsFieldName.Length
+            + statsValue.Length;
         Fill(first, abilities, reserved, MaxFieldsPerEmbed - 1, forceFirst: false);
         first.AddField(StatsFieldName, statsValue);
 

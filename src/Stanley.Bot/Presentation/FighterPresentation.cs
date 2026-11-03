@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Discord;
 using Microsoft.Extensions.Options;
 using Stanley.Bot.Configuration;
@@ -12,7 +12,7 @@ namespace Stanley.Bot.Presentation;
 /// </summary>
 /// <remarks>
 /// Every emoji is optional. When one is not configured the card falls back to text, so the
-/// command works before the application emojis of FR-23 have been uploaded and keeps working
+/// command works before the application emojis have been uploaded and keeps working
 /// if one is later removed.
 /// </remarks>
 public sealed class FighterPresentation(IOptions<PresentationOptions> options)
@@ -26,15 +26,17 @@ public sealed class FighterPresentation(IOptions<PresentationOptions> options)
 
     private const string Health = "HP";
 
+    /// <summary>The name of the editor role whose icon <c>/credits</c> shows.</summary>
+    private const string WikiEditor = "Wiki Editor";
+
     /// <summary>
-    /// The fighter-score icon.
+    /// The Wiki Editor icon, shown by <c>/credits</c> before the team's name.
     /// </summary>
     /// <remarks>
-    /// Read from the same configuration the card's STATS field reads, so the skull is
-    /// configured once and <c>/credits</c> cannot end up showing a different one (FR-18,
-    /// FR-23).
+    /// Configured like every other emoji, so it is changed without a deploy and the credits
+    /// simply read without it until it has been uploaded.
     /// </remarks>
-    public string? FighterScoreIcon => Emoji(_options.StatEmoji, FighterScore);
+    public string? WikiEditorIcon => Emoji(_options.RoleEmoji, WikiEditor);
 
     /// <summary>
     /// The card title: rarity, element and character, each with its icon
@@ -54,6 +56,20 @@ public sealed class FighterPresentation(IOptions<PresentationOptions> options)
         + $"{Stat(Health, card.BaseHp)}\n"
         + $"Max {Stat(FighterScore, card.Max.Fs)}  {Stat(Attack, card.Max.Atk)}  "
         + $"{Stat(Health, card.Max.Hp)}";
+
+    /// <summary>
+    /// The quote shown above the abilities: the stored text in quotation marks, in italics.
+    /// Null when the fighter has no quote, which is what keeps the line off the card.
+    /// </summary>
+    /// <remarks>
+    /// Discord markdown has no way to centre a line, so the quote sits left-aligned like every
+    /// other line of the card. The text is sanitised because an editor's quote is free text and
+    /// a stray <c>*</c> would otherwise end the italics early.
+    /// </remarks>
+    public static string? QuoteLine(string? quote) =>
+        string.IsNullOrWhiteSpace(quote)
+            ? null
+            : Format.Italics($"\"{Format.Sanitize(quote.Trim())}\"");
 
     /// <summary>
     /// The field name for one signature ability.

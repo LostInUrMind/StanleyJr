@@ -1,7 +1,7 @@
 namespace Stanley.Data.Aliases;
 
 /// <summary>
-/// Why <c>/alias-admin add</c> did or did not add the alias (FR-10).
+/// Why <c>/alias-admin add</c> did or did not add the alias.
 /// </summary>
 public enum AliasAddOutcome
 {
@@ -13,7 +13,7 @@ public enum AliasAddOutcome
 }
 
 /// <summary>
-/// The outcome of <c>/alias-admin add</c>, with whatever the reply has to name (FR-10).
+/// The outcome of <c>/alias-admin add</c>, with whatever the reply has to name.
 /// </summary>
 /// <param name="Outcome">What happened.</param>
 /// <param name="Alias">The alias as the editor typed it, trimmed.</param>

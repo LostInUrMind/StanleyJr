@@ -39,4 +39,8 @@ public sealed class PresentationOptions
     /// <summary>Keyed by stat abbreviation: FS, ATK, HP.</summary>
     public Dictionary<string, string> StatEmoji { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Keyed by role name: Wiki Editor.</summary>
+    public Dictionary<string, string> RoleEmoji { get; set; } =
+        new(StringComparer.OrdinalIgnoreCase);
 }

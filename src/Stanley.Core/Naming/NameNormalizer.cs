@@ -4,7 +4,7 @@ using System.Text;
 namespace Stanley.Core.Naming;
 
 /// <summary>
-/// Turns a display name into the slug used for lookups (FR-02).
+/// Turns a display name into the slug used for lookups.
 /// </summary>
 public static class NameNormalizer
 {

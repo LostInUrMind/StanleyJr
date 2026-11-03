@@ -1,13 +1,13 @@
 namespace Stanley.Data.Lookup;
 
 /// <summary>
-/// One autocomplete suggestion (FR-03).
+/// One autocomplete suggestion.
 /// </summary>
 /// <param name="Label">The name or alias that matched, as it is displayed.</param>
 /// <param name="FighterName">
 /// The fighter the match belongs to. Equal to <paramref name="Label"/> for a name match, and
-/// the fighter an alias points at for an alias match, which is what FR-03 requires a typed
-/// alias to suggest.
+/// the fighter an alias points at for an alias match, which is what a typed alias has to
+/// suggest.
 /// </param>
 /// <param name="FighterSlug">
 /// What is sent back when the suggestion is picked. The fighter's own slug, never the alias's,

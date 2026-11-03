@@ -4,7 +4,7 @@ using Stanley.Data;
 namespace Stanley.Bot.Tests;
 
 /// <summary>
-/// The fixed lists FR-13 requires for rarity and element are code, while the rows they name are
+/// The fixed lists for rarity and element are code, while the rows they name are
 /// data. This is what keeps the two from drifting apart.
 /// </summary>
 /// <remarks>

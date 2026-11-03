@@ -9,7 +9,7 @@ namespace Stanley.Bot.Modules;
 
 /// <summary>
 /// <c>/alias-admin</c>: the editor commands that add and remove the other names a fighter is
-/// known by (FR-10, FR-11). Listing them is <c>/alias list</c>, which everyone can run.
+/// known by. Listing them is <c>/alias list</c>, which everyone can run.
 /// </summary>
 /// <remarks>
 /// <para>

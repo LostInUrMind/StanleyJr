@@ -6,7 +6,7 @@ using Stanley.Data.Aliases;
 namespace Stanley.Bot.Modules;
 
 /// <summary>
-/// <c>/alias</c>: the other names a fighter is known by, listed for everyone (FR-09).
+/// <c>/alias</c>: the other names a fighter is known by, listed for everyone.
 /// </summary>
 /// <remarks>
 /// <para>

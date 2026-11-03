@@ -5,7 +5,7 @@ using Stanley.Bot.Presentation;
 namespace Stanley.Bot.Modules;
 
 /// <summary>
-/// <c>/credits</c>: who made Stanley (FR-18).
+/// <c>/credits</c>: who made Stanley.
 /// </summary>
 /// <remarks>
 public sealed class CreditsModule(FighterPresentation presentation)
@@ -14,6 +14,6 @@ public sealed class CreditsModule(FighterPresentation presentation)
     [SlashCommand("credits", "Who made Stanley.")]
     public Task CreditsAsync() =>
         RespondAsync(
-            Replies.Credits(presentation.FighterScoreIcon),
+            Replies.Credits(presentation.WikiEditorIcon),
             allowedMentions: AllowedMentions.None);
 }

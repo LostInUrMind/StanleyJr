@@ -5,7 +5,7 @@ namespace Stanley.Bot.Modules;
 
 /// <summary>
 /// Who ran a write command and where, which is the half of a change record that is not the
-/// data itself (FR-15).
+/// data itself.
 /// </summary>
 /// <remarks>
 /// Shared by every module that writes, so the attribution of a change cannot depend on which

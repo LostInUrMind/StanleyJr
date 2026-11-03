@@ -4,7 +4,7 @@ using Stanley.Data.Views;
 using Stanley.Importer;
 
 // A one-off developer tool, not part of the deployed bot: it loads v1's fighters.json into the
-// database once (FR-21, migration plan phase 3). Running it again changes nothing.
+// database once (migration plan phase 3). Running it again changes nothing.
 //
 //   dotnet run --project tools/Stanley.Importer -- .old/fighters.json
 //

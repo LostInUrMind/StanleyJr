@@ -9,8 +9,8 @@ namespace Stanley.Bot.Modules;
 
 /// <summary>
 /// <c>/fighter-admin</c>: the editor commands that keep the fighter data right — adding a
-/// fighter (FR-12), changing one (FR-13), writing its signature abilities (FR-13) and removing
-/// it (FR-14).
+/// fighter, changing one, writing its signature abilities and removing
+/// it.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -50,7 +50,7 @@ public sealed class FighterAdminModule(FighterAdminRepository fighters)
     /// <summary>Long enough for the portrait URLs, which are deep GitHub paths.</summary>
     private const int MaxUrlLength = 500;
 
-    /// <summary>Who is making the change, for the change record (FR-15).</summary>
+    /// <summary>Who is making the change, for the change record.</summary>
     private EditorContext Editor => EditorContexts.Of(Context);
 
     [SlashCommand(
@@ -68,7 +68,9 @@ public sealed class FighterAdminModule(FighterAdminRepository fighters)
         string character,
         [Summary("rarity", "The fighter's rarity.")] FighterRarity rarity,
         [Summary("element", "The fighter's element.")] FighterElement element,
-        [Summary("ability-name", "The signature ability name, for example RIFF WRATH.")]
+        [Summary(
+            "ability-name",
+            "The signature ability name, for example RIFF WRATH. Stored in capitals.")]
         [MinLength(1)]
         [MaxLength(MaxNameLength)]
         string abilityName,
@@ -132,7 +134,7 @@ public sealed class FighterAdminModule(FighterAdminRepository fighters)
         string? character = null,
         [Summary("rarity", "The fighter's rarity.")] FighterRarity? rarity = null,
         [Summary("element", "The fighter's element.")] FighterElement? element = null,
-        [Summary("ability-name", "The signature ability name.")]
+        [Summary("ability-name", "The signature ability name. Stored in capitals.")]
         [MinLength(1)]
         [MaxLength(MaxNameLength)]
         string? abilityName = null,
@@ -183,7 +185,7 @@ public sealed class FighterAdminModule(FighterAdminRepository fighters)
     }
 
     /// <summary>
-    /// Writes one signature ability, or removes the whole block (FR-13).
+    /// Writes one signature ability, or removes the whole block.
     /// </summary>
     [SlashCommand("ability", "Write one signature ability, or remove every one a fighter has.")]
     public async Task AbilityAsync(
@@ -217,8 +219,8 @@ public sealed class FighterAdminModule(FighterAdminRepository fighters)
             return;
         }
 
-        // The form is the response to this command, so the three seconds of NFR-01 are spent on
-        // the one read above; the write happens when the form comes back.
+        // The form is the response to this command, so the three seconds Discord allows are
+        // spent on the one read above; the write happens when the form comes back.
         await RespondWithModalAsync(AbilityModal.Build(prompt));
     }
 
@@ -241,8 +243,8 @@ public sealed class FighterAdminModule(FighterAdminRepository fighters)
             return;
         }
 
-        // Asked first, never done first: FR-14 requires a confirmation step, and this one says
-        // what goes with the fighter before anything is removed.
+        // Asked first, never done first: removing a fighter needs a confirmation step, and
+        // this one says what goes with the fighter before anything is removed.
         await RespondAsync(
             AdminReplies.ConfirmRemoveFighter(target),
             ephemeral: true,

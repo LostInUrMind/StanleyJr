@@ -1,5 +1,6 @@
 using System.Globalization;
 using Stanley.Data.Fighters;
+using Stanley.Data.Wiki;
 
 namespace Stanley.Bot.Presentation;
 
@@ -25,9 +26,13 @@ internal static class AdminReplies
     /// </summary>
     public const string StaleFighter = "That fighter no longer exists, so nothing was changed.";
 
+    /// <summary>The same, for a wiki page an edit came back for after it was removed.</summary>
+    private const string StaleWikiPage =
+        "That wiki page no longer exists, so nothing was changed.";
+
     /// <summary>
     /// <c>remove all</c> takes the whole block, so an SA number with it would be a number the
-    /// command cannot honour rather than a narrower removal (FR-13).
+    /// command cannot honour rather than a narrower removal.
     /// </summary>
     public const string SaNumberNeedsSet =
         "The SA number belongs to ‘set’. Removing abilities removes every one the fighter has, so there is no SA number to give.";
@@ -38,7 +43,7 @@ internal static class AdminReplies
     /// <summary>What a field that holds nothing reads as in a change line.</summary>
     private const string NotSet = "(not set)";
 
-    /// <summary>The confirmation or refusal after <c>/fighter-admin add</c> (FR-12).</summary>
+    /// <summary>The confirmation or refusal after <c>/fighter-admin add</c>.</summary>
     public static string FighterAdded(FighterWriteResult result, string input)
     {
         ArgumentNullException.ThrowIfNull(result);
@@ -61,7 +66,7 @@ internal static class AdminReplies
     }
 
     /// <summary>
-    /// The refusal when a form cannot be opened for the ability the editor asked for (FR-13).
+    /// The refusal when a form cannot be opened for the ability the editor asked for.
     /// </summary>
     public static string AbilityNotPrompted(AbilityPrompt prompt, string input)
     {
@@ -87,7 +92,7 @@ internal static class AdminReplies
         return Truncate($"SA{N(prompt.Ordinal)} · {prompt.FighterName}", MaxModalTitleLength);
     }
 
-    /// <summary>The confirmation or refusal after a form is submitted (FR-13).</summary>
+    /// <summary>The confirmation or refusal after a form is submitted.</summary>
     public static string AbilityWritten(AbilitySetResult result)
     {
         ArgumentNullException.ThrowIfNull(result);
@@ -108,7 +113,7 @@ internal static class AdminReplies
 
     /// <summary>
     /// The question the confirm and cancel buttons answer before a fighter's abilities are
-    /// removed (FR-13, FRD section 6.1).
+    /// removed (FRD section 6.1).
     /// </summary>
     public static string ConfirmRemoveAbilities(FighterTarget target)
     {
@@ -138,7 +143,7 @@ internal static class AdminReplies
 
     /// <summary>
     /// The question the confirm and cancel buttons answer before a fighter is removed, naming
-    /// what goes with it (FR-14).
+    /// what goes with it.
     /// </summary>
     public static string ConfirmRemoveFighter(FighterTarget target)
     {
@@ -149,7 +154,7 @@ internal static class AdminReplies
             + "nothing in Discord puts it back.";
     }
 
-    /// <summary>The confirmation or refusal after a fighter is removed (FR-14).</summary>
+    /// <summary>The confirmation or refusal after a fighter is removed.</summary>
     public static string FighterRemoved(FighterRemovalResult result)
     {
         ArgumentNullException.ThrowIfNull(result);
@@ -161,9 +166,112 @@ internal static class AdminReplies
             : StaleFighter;
     }
 
+    /// <summary>The confirmation or refusal after <c>/wiki-admin add</c>.</summary>
+    public static string WikiPageAdded(WikiPageWriteResult result, string input)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+
+        return result.Outcome is WikiPageWriteOutcome.Ok
+            ? $"Added the wiki page ‘{result.Key}’, linking {result.Url}."
+            : WikiRefused(result, input);
+    }
+
+    /// <summary>The confirmation or refusal after <c>/wiki-admin edit</c>.</summary>
+    public static string WikiPageEdited(WikiPageWriteResult result, string input)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+
+        return result.Outcome is WikiPageWriteOutcome.Ok
+            ? WikiChanges(result.Key!, result.Changes)
+            : WikiRefused(result, input);
+    }
+
+    /// <summary>The confirmation after <c>/wiki-admin remove</c>.</summary>
+    public static string WikiPageRemoved(RemovedWikiPage removed)
+    {
+        ArgumentNullException.ThrowIfNull(removed);
+
+        return $"Removed the wiki page ‘{removed.Key}’, which linked {removed.Url}.";
+    }
+
     /// <summary>
-    /// Every refusal of a write to a fighter's own fields, each stating the rule it broke
-    /// (FR-13).
+    /// The reply when the page to change or remove does not exist. Separate from
+    /// <see cref="Replies.NoMatch"/>, which is about fighters.
+    /// </summary>
+    public static string NoWikiPageMatch(string input) =>
+        $"No wiki page matches ‘{input}’. Try the suggestions while typing.";
+
+    /// <summary>
+    /// Every refusal of a write to a wiki page, each stating the rule it broke.
+    /// </summary>
+    private static string WikiRefused(WikiPageWriteResult result, string input) =>
+        result.Outcome switch
+        {
+            WikiPageWriteOutcome.PageNotFound => NoWikiPageMatch(input),
+
+            // The same rule as a fighter's name and an alias: matching ignores everything but
+            // letters and digits, so a key of punctuation alone could never be typed back.
+            WikiPageWriteOutcome.KeyNotUsable =>
+                $"‘{result.Key}’ has no letters or digits, so nothing would ever match "
+                + "it. Use a key with at least one letter or digit.",
+
+            WikiPageWriteOutcome.KeyTaken =>
+                $"‘{result.Key}’ already finds the wiki page ‘{result.Detail}’. "
+                + "Change that page instead, or pick another key.",
+
+            // Wiki pages are resolved before fighters, so this key would make that fighter
+            // unreachable through /wiki.
+            WikiPageWriteOutcome.KeyFindsFighter =>
+                $"‘{result.Key}’ already finds the fighter {result.Detail}, so a wiki "
+                + "page under that key would hide it. Use a different key.",
+
+            WikiPageWriteOutcome.UrlMissing => $"The {WikiLabel(result.Field)} cannot be blank.",
+
+            WikiPageWriteOutcome.UrlNotAUrl =>
+                $"The {WikiLabel(result.Field)} has to be a web address starting with http:// "
+                + $"or https://. ‘{result.Detail}’ is not one.",
+
+            WikiPageWriteOutcome.NothingGiven =>
+                "Give a new key, a new address, or both. Nothing was changed.",
+
+            WikiPageWriteOutcome.NothingToChange =>
+                $"Nothing to change: the wiki page ‘{result.Key}’ already holds every "
+                + "value you gave.",
+
+            _ => StaleWikiPage,
+        };
+
+    /// <summary>
+    /// The old and new values of everything an edit changed, one per line, as the fighter
+    /// confirmations show them.
+    /// </summary>
+    /// <remarks>
+    /// A page has two fields, both capped by the command's options, so the message cannot
+    /// outgrow what Discord accepts the way a fighter's can. It is cut to fit regardless,
+    /// because a reply too long fails the command rather than answering it.
+    /// </remarks>
+    private static string WikiChanges(string key, IReadOnlyList<WikiPageFieldChange> changes)
+    {
+        string message = string.Join(
+            '\n',
+            changes
+                .Select(change =>
+                    $"• {WikiLabel(change.Field)}: {Truncate(change.Before, MaxValueLength)}"
+                    + $" → {Truncate(change.After, MaxValueLength)}")
+                .Prepend($"Updated the wiki page ‘{key}’:"));
+
+        return Truncate(message, Replies.MaxMessageLength);
+    }
+
+    private static string WikiLabel(WikiPageField? field) => field switch
+    {
+        WikiPageField.Key => "key",
+        WikiPageField.Url => "address",
+        _ => "value",
+    };
+
+    /// <summary>
+    /// Every refusal of a write to a fighter's own fields, each stating the rule it broke.
     /// </summary>
     private static string Refused(FighterWriteResult result, string input) => result.Outcome switch
     {
@@ -173,7 +281,7 @@ internal static class AdminReplies
             $"‘{result.FighterName}’ has no letters or digits, so nothing would ever match it. "
             + "Give the fighter a name with at least one letter or digit.",
 
-        // FR-10 words this for aliases; a fighter's name follows the same rule, because the
+        // The FRD words this for aliases; a fighter's name follows the same rule, because the
         // two are looked up together (database design section 3.2).
         FighterWriteOutcome.NameTaken =>
             $"‘{result.FighterName}’ already finds {result.Detail}. A fighter's name cannot be "
@@ -199,7 +307,7 @@ internal static class AdminReplies
     };
 
     /// <summary>
-    /// The old and new values of everything an edit changed, one per line (FR-13).
+    /// The old and new values of everything an edit changed, one per line.
     /// </summary>
     private static string Changes(string fighterName, IReadOnlyList<FighterFieldChange> changes)
     {

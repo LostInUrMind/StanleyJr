@@ -14,7 +14,7 @@ internal sealed class VariantAliasConfiguration : IEntityTypeConfiguration<Varia
 
         builder.HasIndex(a => a.VariantId).HasDatabaseName("ix_aliases_variant");
 
-        // So FR-03 can suggest across names and aliases together.
+        // So autocomplete can suggest across names and aliases together.
         builder
             .HasIndex([nameof(VariantAlias.Alias)], "ix_aliases_trgm")
             .HasDatabaseName("ix_aliases_trgm")
@@ -23,7 +23,7 @@ internal sealed class VariantAliasConfiguration : IEntityTypeConfiguration<Varia
 
         builder.Property(a => a.CreatedAt).HasDefaultValueSql("now()");
 
-        // Cascade: "the fighter's aliases are removed with it" (FR-14).
+        // Cascade: "the fighter's aliases are removed with it".
         builder
             .HasOne(a => a.Variant)
             .WithMany(v => v.Aliases)

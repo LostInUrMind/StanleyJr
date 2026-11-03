@@ -38,7 +38,7 @@ public sealed class AbilityModal : IModal
 
     /// <summary>
     /// The form for <paramref name="prompt"/>, pre-filled with the ability's current text when
-    /// it has one, which is what FR-13 requires of an edit.
+    /// it has one, so that an edit starts from what is stored.
     /// </summary>
     public static Modal Build(AbilityPrompt prompt)
     {

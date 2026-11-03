@@ -17,7 +17,7 @@ public class Variant : ITimestamped
 
     /// <summary>
     /// <see cref="Name"/> run through <see cref="Core.Naming.NameNormalizer"/>, which is what
-    /// makes the tolerant lookup in FR-02 possible. Unique, and never set by hand.
+    /// makes the tolerant lookup possible. Unique, and never set by hand.
     /// </summary>
     public required string Slug { get; set; }
 
@@ -48,7 +48,7 @@ public class Variant : ITimestamped
     public bool IsRaidBoss { get; set; }
 
     /// <summary>
-    /// Override for the wiki link. Normally empty: FR-07 builds the URL from
+    /// Override for the wiki link. Normally empty: the URL is built from
     /// <see cref="Name"/>. Kept so an editor can fix a page whose title differs.
     /// </summary>
     public string? WikiUrl { get; set; }

@@ -6,7 +6,7 @@ namespace Stanley.Data.Entities;
 /// </summary>
 /// <remarks>
 /// A table rather than a C# enum because it carries data of its own:
-/// <see cref="EvolutionsToMax"/> drives the maximum-stat formula (FR-06).
+/// <see cref="EvolutionsToMax"/> drives the maximum-stat formula.
 /// </remarks>
 public class Tier
 {

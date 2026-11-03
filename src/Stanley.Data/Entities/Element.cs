@@ -6,7 +6,7 @@ namespace Stanley.Data.Entities;
 /// <remarks>
 /// A table rather than a C# enum because it carries the card's side-strip colour
 /// (FRD Table A-1). Colour is data, so an editor can correct it without a deploy; the emoji
-/// next to it is presentation and lives in the bot's configuration instead (FR-23).
+/// next to it is presentation and lives in the bot's configuration instead.
 /// </remarks>
 public class Element
 {

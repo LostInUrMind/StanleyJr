@@ -4,7 +4,7 @@ namespace Stanley.Data.Aliases;
 
 /// <summary>
 /// A copy of one <c>variant_aliases</c> row, as it is stored in a change record's
-/// <c>before</c> and <c>after</c> (FR-15).
+/// <c>before</c> and <c>after</c>.
 /// </summary>
 /// <remarks>
 /// A snapshot type rather than the entity: serializing <see cref="VariantAlias"/> would follow

@@ -3,7 +3,7 @@ using Stanley.Core.Naming;
 namespace Stanley.Core.Tests;
 
 /// <summary>
-/// FR-02: a name matches whatever the user typed, ignoring case, spaces, apostrophes and
+/// A name matches whatever the user typed, ignoring case, spaces, apostrophes and
 /// punctuation. v1 could not find 23 of its 309 fighters by name at all, so these tests cover
 /// the shapes that broke it.
 /// </summary>

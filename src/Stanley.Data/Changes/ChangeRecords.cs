@@ -8,7 +8,7 @@ namespace Stanley.Data.Changes;
 /// </summary>
 /// <remarks>
 /// Every write command goes through this, so <c>before</c> and <c>after</c> have the same JSON
-/// shape whichever command wrote them and an undo (FR-16) has one shape to read.
+/// shape whichever command wrote them and an undo has one shape to read.
 /// <see cref="ChangeRecord.OccurredAt"/> is left unset: the column defaults to
 /// <c>now()</c>, so the time comes from the database that is also committing the change.
 /// </remarks>

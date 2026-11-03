@@ -13,7 +13,7 @@ internal sealed class VariantConfiguration : IEntityTypeConfiguration<Variant>
         builder.HasIndex(v => v.Name).IsUnique();
         builder.HasIndex(v => v.Slug).IsUnique();
 
-        // The similarity fallback in FR-02 and the suggestions in FR-03 read these. A second,
+        // The lookup's similarity fallback and the suggestions read these. A second,
         // named index on the same column is how a trigram index sits beside the unique one.
         builder
             .HasIndex([nameof(Variant.Name)], "ix_variants_name_trgm")

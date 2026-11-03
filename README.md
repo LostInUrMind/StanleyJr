@@ -8,10 +8,14 @@ own:
 
 - [`docs/user-manual.md`](docs/user-manual.md) — the commands everyone can run, and the note for
   server admins.
-- [`docs/editor-manual.md`](docs/editor-manual.md) — `/alias-admin` and `/fighter-admin`, for
-  wiki editors.
+- [`docs/editor-manual.md`](docs/editor-manual.md) — `/alias-admin`, `/fighter-admin` and
+  `/wiki-admin`, for wiki editors.
 
 ## Layout
+
+[`docs/codebase.md`](docs/codebase.md) is the map of all of it: which project holds what, where
+each kind of change goes, the conventions, and the traps. Read it before changing code, and keep
+it current when you do.
 
 | Path | What it holds |
 |---|---|
@@ -45,7 +49,7 @@ Two things to check before you start:
 
 1. **Make yourself a bot.** In the [Discord Developer Portal](https://discord.com/developers),
    create an application — call it something like `Stanley Dev` — and copy its token. Never run
-   development code with the production token (NFR-06). Stanley needs no privileged intents;
+   development code with the production token. Stanley needs no privileged intents;
    leave all three switched off.
 2. **Make yourself a test server.** A private Discord server you own, with a second account or a
    friend in it, so you can check that a command refuses someone without the editor role.
@@ -144,7 +148,7 @@ DataAnnotation validation failed for 'DiscordOptions' members: 'Token' with the 
 | `failed to connect to the docker API at npipe:...` | The Docker daemon is not running. On Windows Home it also needs WSL2; see the top of this section. |
 | `/alias-admin add` answers "Only Wiki Editors can change Stanley's data" although the role is held | Stanley is probably not a *member* of that server — commands can be registered to a server the bot never joined. `GET /users/@me/guilds` with the bot token returning `[]` confirms it; re-invite with the `bot` scope (above). |
 | `/alias-admin add` answers "Editing is not set up yet", or the write commands appear in no server at all | `Discord:HomeGuildId`, `Discord:WikiEditorRoleId` or `Discord:TestGuildIds` is not reaching this run. `.env` is read by Docker Compose only; a host-side `dotnet run` reads user secrets and the environment. The bot logs a warning at startup when the first two are missing, and another naming the editor commands it registered nowhere. |
-| `/alias-admin` or `/fighter-admin` does not appear for a Wiki Editor, not even in the suggestions | Discord hides them: they are limited to Administrator, so the Wiki Editor role has to be given access under Server Settings, Integrations, Stanley, Manage in the home server. Check the startup log for the line naming the server they were registered to. |
+| `/alias-admin`, `/fighter-admin` or `/wiki-admin` does not appear for a Wiki Editor, not even in the suggestions | Discord hides them: they are limited to Administrator, so the Wiki Editor role has to be given access under Server Settings, Integrations, Stanley, Manage in the home server. Check the startup log for the line naming the server they were registered to. |
 | A command Discord offers answers "That command does not exist any more" | A registration from an earlier run that this build no longer has, which Discord keeps until it is overwritten. Restart the bot: it now rewrites every scope it uses, and logs what it registered and what it removed. The picker can go on showing the old one for a few minutes from the client's own cache. |
 | `password authentication failed for user "<your_user_name>"` | The database is a different server than the container, or the volume was created with another `POSTGRES_PASSWORD`. |
 
@@ -171,7 +175,7 @@ dotnet test
 ```
 
 - `Stanley.Core.Tests` needs nothing. Its main job is the golden test: v2's maximum stats must
-  equal v1's for every one of the 309 fighters (FR-06). If it fails, the formula changed.
+  equal v1's for every one of the 309 fighters. If it fails, the formula changed.
 - `Stanley.Data.Tests` needs Docker. Testcontainers starts a real PostgreSQL, applies the
   migration and checks the seeded rows, the views and every constraint. Without Docker, skip
   them:
@@ -192,7 +196,7 @@ dotnet test
 
 2. Keep the handler thin. Put the logic in a service in `Stanley.Core` (or a repository in
    `Stanley.Data`) and inject it through the module's constructor; that is the part you unit-test.
-3. Answer within three seconds, or `await DeferAsync()` first and follow up (NFR-01).
+3. Answer within three seconds, or `await DeferAsync()` first and follow up.
 4. Make error and confirmation replies `ephemeral: true`, and never let a reply mention anyone
    (FRD section 6.2).
 5. Nothing needs registering by hand: modules are discovered at startup, and while
@@ -203,14 +207,15 @@ Write commands additionally get the `[RequireWikiEditor]` precondition
 the home server, both matched by ID. It fails closed: while `Discord:HomeGuildId` or
 `Discord:WikiEditorRoleId` is unset, every write command refuses everyone.
 
-**Write commands live in a top-level command of their own**, `/alias-admin` or
-`/fighter-admin`, which is what lets them be registered to the home server alone so they do not
+**Write commands live in a top-level command of their own**, `/alias-admin`,
+`/fighter-admin` or `/wiki-admin`, which is what lets them be registered to the home server alone so they do not
 appear anywhere else. Discord registers a top-level command with all of its subcommands, and keeps a server's commands apart from the global ones, so a write *subcommand* of a command everyone can run cannot be narrowed: it is registered wherever its siblings are, and a guild copy carrying it would show up as a second `/alias` next to the global one. `DefaultMemberPermissions` is per top-level command for the same reason. So a new write
 command belongs on an `-admin` module (marked `[DontAutoRegister]`, which is what `DiscordBotService` registers to the home server), not next to a read command.
 
 ## Letting editors change data
 
-`/alias-admin` and `/fighter-admin` are refused for everyone until both of these are set,
+`/alias-admin`, `/fighter-admin` and `/wiki-admin` are refused for everyone until both of
+these are set,
 because the role is matched by ID and there is no default. Without `Discord:HomeGuildId` they
 are not registered anywhere either, so they appear in no server at all:
 
@@ -234,24 +239,24 @@ https://discord.com/oauth2/authorize?client_id=<app id>&scope=bot+applications.c
 Set them like the token — user secrets locally, `Discord__HomeGuildId` and
 `Discord__WikiEditorRoleId` in Docker (`.env.example` lists them). Filling them into `.env`
 alone is the easy mistake: Compose passes that file to the container, and a host-side
-`dotnet run` never reads it. Who should hold the role is
-FRD FR-17, still deferred; until it is decided, leaving them unset is the safe state rather than
-a broken one.
+`dotnet run` never reads it. Who should hold the role is still deferred in the FRD; until
+it is decided, leaving them unset is the safe state rather than a broken one.
 
 **Then grant the role access inside Discord.** The editor commands are registered with
 `DefaultMemberPermissions` of Administrator, so Discord shows them to administrators only —
 a Wiki Editor who is not an administrator does not see them in the picker at all, which looks
 exactly like a command that was never registered. In the home server, open **Server Settings →
-Integrations → Stanley → Manage** and give the Wiki Editor role access to `/alias-admin` and
-`/fighter-admin`. The bot prints a reminder naming those commands and the server at every
+Integrations → Stanley → Manage** and give the Wiki Editor role access to `/alias-admin`,
+`/fighter-admin` and `/wiki-admin`. The bot prints a reminder naming those commands and the server at every
 startup.
 
 ## Adding or correcting a fighter
 
 In Discord, by a wiki editor, with no deploy and no developer:
 [`docs/editor-manual.md`](docs/editor-manual.md) is the whole of it. Every write is recorded
-with the editor’s Discord ID in `change_records` (FR-15), and a fighter added that way is on
-`/fighter` straight away — nothing is cached and nothing needs a restart.
+with the editor’s Discord ID in `change_records`, and a fighter added that way is on
+`/fighter` straight away — nothing is cached and nothing needs a restart. Aliases
+(`/alias-admin`) and the wiki pages that are not fighters (`/wiki-admin`) work the same way.
 
 ## Changing the schema
 
@@ -287,10 +292,10 @@ instead of looking successful. Pass a service name (`./scripts/up.sh postgres`) 
 only, or set `STANLEY_UP_TIMEOUT` for a slow first build. `docker compose up -d --build` still
 works if you want the raw command.
 
-- `restart: unless-stopped` brings the bot back after a crash or a reboot (NFR-04).
+- `restart: unless-stopped` brings the bot back after a crash or a reboot.
 - Clear `DISCORD_TEST_GUILD_IDS` in the server's `.env`, and make sure the production image is
   not built with a `TestGuildIds` list in `appsettings.Development.json`, so commands register
   globally.
 - Still to set up in phase 6: the nightly `pg_dump` to off-box storage **with one restore
-  tested** (NFR-05), and an alert when the bot has been offline for five minutes.
+  tested**, and an alert when the bot has been offline for five minutes.
 

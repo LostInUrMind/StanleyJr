@@ -21,7 +21,7 @@ internal sealed class LegacyFighter
     /// <summary>
     /// The character, prefixed with a custom emoji, for example
     /// <c>&lt;:sp_an:767922687204524032&gt; Annie</c>. The emoji is stripped on import: it is
-    /// presentation, and v1's emoji only rendered in the server that owned them (FR-23).
+    /// presentation, and v1's emoji only rendered in the server that owned them.
     /// </summary>
     [JsonPropertyName("character")]
     public string Character { get; set; } = string.Empty;

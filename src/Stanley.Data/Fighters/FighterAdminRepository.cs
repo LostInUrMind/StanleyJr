@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Stanley.Core.Naming;
+using Stanley.Core.Validation;
 using Stanley.Data.Aliases;
 using Stanley.Data.Changes;
 using Stanley.Data.Entities;
@@ -10,13 +11,13 @@ using Stanley.Data.Lookup;
 namespace Stanley.Data.Fighters;
 
 /// <summary>
-/// The fighter data an editor manages from Discord: adding a fighter (FR-12), changing one
-/// (FR-13), writing and removing its signature abilities (FR-13), and removing it with
-/// everything that belongs to it (FR-14).
+/// The fighter data an editor manages from Discord: adding a fighter, changing one, writing
+/// and removing its signature abilities, and removing it with everything that belongs to
+/// it.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Every rule FR-13 says a refusal must state lives here rather than in the command, so the
+/// Every rule a refusal must state lives here rather than in the command, so the
 /// rules are tested without Discord and cannot differ between the four subcommands. Discord
 /// checks what it can — a required option, an integer above zero, a fixed list of choices, a
 /// form field of at most 1,024 characters — and none of that is load-bearing: an option can
@@ -30,16 +31,16 @@ namespace Stanley.Data.Fighters;
 /// </para>
 /// <para>
 /// Every write appends change records in the same transaction as the change, so a change that
-/// could not be recorded is not kept (FR-15). A removal records one row per ability and per
+/// could not be recorded is not kept. A removal records one row per ability and per
 /// alias as well as the fighter, because those records are the only copy of the rows that is
-/// left (FR-16).
+/// left.
 /// </para>
 /// </remarks>
 public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> contextFactory)
 {
     /// <summary>
-    /// Adds a fighter from the values FR-12 asks for. Its abilities are added afterwards, one
-    /// at a time (FR-13).
+    /// Adds a fighter from the values the command asks for. Its abilities are added
+    /// afterwards, one at a time.
     /// </summary>
     public async Task<FighterWriteResult> AddAsync(
         FighterDraft draft,
@@ -50,7 +51,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
 
         string name = draft.Name?.Trim() ?? string.Empty;
         string slug = NameNormalizer.Normalize(name);
-        string saName = draft.AbilityName?.Trim() ?? string.Empty;
+        string saName = Capitalised(draft.AbilityName) ?? string.Empty;
         string? quote = draft.Quote?.Trim();
         string portraitUrl = draft.PortraitUrl?.Trim() ?? string.Empty;
 
@@ -127,7 +128,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
 
     /// <summary>
     /// Changes the fields the editor gave on the fighter <paramref name="fighter"/> names, and
-    /// reports which of them actually changed (FR-13).
+    /// reports which of them actually changed.
     /// </summary>
     public async Task<FighterWriteResult> EditAsync(
         string? fighter,
@@ -146,7 +147,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
 
         string? newName = edit.Name?.Trim();
         string? newSlug = newName is null ? null : NameNormalizer.Normalize(newName);
-        string? saName = edit.AbilityName?.Trim();
+        string? saName = Capitalised(edit.AbilityName);
         string? quote = edit.Quote?.Trim();
         string? portraitUrl = edit.PortraitUrl?.Trim();
         string? wikiUrl = edit.WikiUrl?.Trim();
@@ -350,8 +351,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
     }
 
     /// <summary>
-    /// The fighter a confirmation step is about to act on, and what would go with it (FR-13,
-    /// FR-14). Null when <paramref name="fighter"/> names no fighter.
+    /// The fighter a confirmation step is about to act on, and what would go with it. Null when <paramref name="fighter"/> names no fighter.
     /// </summary>
     public async Task<FighterTarget?> FindTargetAsync(
         string? fighter,
@@ -385,8 +385,8 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
     }
 
     /// <summary>
-    /// Works out which signature ability a form would write, and the text to pre-fill it with
-    /// (FR-13). Nothing is written here.
+    /// Works out which signature ability a form would write, and the text to pre-fill it
+    /// with. Nothing is written here.
     /// </summary>
     /// <param name="fighter">The fighter option, as the editor gave it.</param>
     /// <param name="saNumber">
@@ -452,7 +452,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
 
     /// <summary>
     /// Writes one signature ability: the text of an ability that exists, or a new one at the
-    /// end of the block (FR-13).
+    /// end of the block.
     /// </summary>
     /// <remarks>
     /// The ability is addressed by the row's own key, which the form carried, so nothing is
@@ -554,7 +554,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
     }
 
     /// <summary>
-    /// Removes every signature ability the fighter has (FR-13). The fighter stays, and the
+    /// Removes every signature ability the fighter has. The fighter stays, and the
     /// block is re-entered from SA1.
     /// </summary>
     /// <remarks>
@@ -593,8 +593,8 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
 
         foreach (SignatureAbility ability in block)
         {
-            // Taken before the delete: afterwards the record holds the only copy of the row
-            // (FR-15), and it is what an undo would restore (FR-16).
+            // Taken before the delete: afterwards the record holds the only copy of the
+            // row, and it is what an undo would restore.
             db.ChangeRecords.Add(ChangeRecords.Delete(
                 editor,
                 ChangeEntityType.SignatureAbility,
@@ -612,12 +612,12 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
     }
 
     /// <summary>
-    /// Removes the fighter, its signature abilities and its aliases (FR-14).
+    /// Removes the fighter, its signature abilities and its aliases.
     /// </summary>
     /// <remarks>
     /// The abilities and aliases are cascaded by the schema, and each one is recorded here all
-    /// the same: a cascade leaves no trace of what it took, and FR-15 is what a developer reads
-    /// to put a bad removal back.
+    /// the same: a cascade leaves no trace of what it took, and the change record is what a
+    /// developer reads to put a bad removal back.
     /// </remarks>
     public async Task<FighterRemovalResult> RemoveAsync(
         int variantId,
@@ -674,7 +674,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
 
     /// <summary>
     /// Suggests characters for what the editor has typed so far, for the <c>character</c>
-    /// option of <c>/fighter-admin add</c> and <c>edit</c> (FR-12).
+    /// option of <c>/fighter-admin add</c> and <c>edit</c>.
     /// </summary>
     /// <remarks>
     /// Matched in memory: there are 18 characters, the table has no slug column of its own, and
@@ -799,7 +799,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
             .FirstOrDefaultAsync(cancellationToken);
 
     /// <summary>
-    /// The character <paramref name="typed"/> names, or null when it names none (FR-12).
+    /// The character <paramref name="typed"/> names, or null when it names none.
     /// </summary>
     private static async Task<(int Id, string Name)?> FindCharacterAsync(
         StanleyDbContext db,
@@ -878,6 +878,24 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
         return match is null ? null : (match.Id, match.Name);
     }
 
+    /// <summary>
+    /// A signature ability's name as it is stored: trimmed, and in capitals.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The cards show SA names in capitals, so the capitals are applied on the way in instead
+    /// of being asked of the editor. Both <c>/fighter-admin add</c> and <c>/fighter-admin
+    /// edit</c> go through here, so the two cannot drift and a name typed either way is stored
+    /// the one way.
+    /// </para>
+    /// <para>
+    /// Invariant casing: the names are English, and a culture-sensitive one would turn an "i"
+    /// into "İ" for an editor on a Turkish machine.
+    /// </para>
+    /// </remarks>
+    private static string? Capitalised(string? abilityName) =>
+        abilityName?.Trim().ToUpperInvariant();
+
     /// <summary>A required value that arrived blank or as whitespace.</summary>
     private static FighterWriteResult? CheckRequired(string value, FighterField field) =>
         value.Length == 0 ? FighterWriteResult.Missing(field) : null;
@@ -892,13 +910,13 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
 
     /// <summary>
     /// A name of punctuation or symbols alone normalizes to nothing, so no lookup could ever
-    /// find the fighter again (FR-02).
+    /// find the fighter again.
     /// </summary>
     private static FighterWriteResult? CheckSlug(string name, string slug) =>
         slug.Length == 0 ? FighterWriteResult.NameNotUsable(name) : null;
 
     /// <summary>
-    /// Stats are whole numbers greater than zero (FR-13). The column has the same check, which
+    /// Stats are whole numbers greater than zero. The column has the same check, which
     /// would fail the command rather than answer it.
     /// </summary>
     private static FighterWriteResult? CheckStat(int? value, FighterField field) =>
@@ -907,7 +925,8 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
     /// <summary>
     /// A URL has to be absolute and <c>http</c> or <c>https</c>: the portrait goes straight
     /// into an embed, and Discord rejects the whole embed over a URL it cannot read, which
-    /// would break the card for everyone rather than for the editor who typed it.
+    /// would break the card for everyone rather than for the editor who typed it. The rule
+    /// itself is <see cref="WebAddress"/>, shared with the wiki pages' URLs.
     /// </summary>
     private static FighterWriteResult? CheckUrl(string value, FighterField field)
     {
@@ -916,10 +935,9 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
             return missing;
         }
 
-        return Uri.TryCreate(value, UriKind.Absolute, out Uri? uri)
-            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
-                ? null
-                : FighterWriteResult.NotAUrl(field, value);
+        return WebAddress.IsAbsoluteHttpUrl(value)
+            ? null
+            : FighterWriteResult.NotAUrl(field, value);
     }
 
     private static FighterWriteResult? CheckGivenUrl(string? value, FighterField field) =>
@@ -927,7 +945,7 @@ public sealed class FighterAdminRepository(IDbContextFactory<StanleyDbContext> c
 
     /// <summary>
     /// Applies one text field the editor gave, unless it already holds that text, and records
-    /// the old and new values for the confirmation (FR-13).
+    /// the old and new values for the confirmation.
     /// </summary>
     private static void ApplyText(
         List<FighterFieldChange> changes,

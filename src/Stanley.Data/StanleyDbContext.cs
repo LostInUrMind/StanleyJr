@@ -27,6 +27,9 @@ public class StanleyDbContext(DbContextOptions<StanleyDbContext> options) : DbCo
 
     public DbSet<VariantAlias> VariantAliases => Set<VariantAlias>();
 
+    /// <summary>The wiki pages that are not fighters.</summary>
+    public DbSet<WikiPage> WikiPages => Set<WikiPage>();
+
     public DbSet<ChangeRecord> ChangeRecords => Set<ChangeRecord>();
 
     /// <summary>Per-tier counts, excluding Raid Bosses. Read-only.</summary>
@@ -40,7 +43,7 @@ public class StanleyDbContext(DbContextOptions<StanleyDbContext> options) : DbCo
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // The similarity fallback in FR-02 needs it; the migration creates it.
+        // The lookup's similarity fallback needs it; the migration creates it.
         modelBuilder.HasPostgresExtension("pg_trgm");
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(StanleyDbContext).Assembly);

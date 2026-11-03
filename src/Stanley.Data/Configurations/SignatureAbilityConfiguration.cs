@@ -23,7 +23,7 @@ internal sealed class SignatureAbilityConfiguration : IEntityTypeConfiguration<S
                 $"char_length(ability_text) <= {SignatureAbility.MaxTextLength}");
         });
 
-        // Cascade: removing a variant removes its abilities (FR-14).
+        // Cascade: removing a variant removes its abilities.
         builder
             .HasOne(a => a.Variant)
             .WithMany(v => v.SignatureAbilities)

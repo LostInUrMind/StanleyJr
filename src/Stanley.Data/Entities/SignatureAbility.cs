@@ -6,8 +6,8 @@ namespace Stanley.Data.Entities;
 /// <remarks>
 /// <para>
 /// One row per ability rather than <c>sa1</c>/<c>sa2</c> columns: a variant has no fixed
-/// maximum (the three current Raid Bosses have five, FR-13), every ability must be shown
-/// (FR-04), and a card that outgrows Discord's limits is split in SA order (FR-26).
+/// maximum (the three current Raid Bosses have five), every ability must be shown, and a
+/// card that outgrows Discord's limits is split in SA order.
 /// </para>
 /// <para>
 /// A single ability is never removed on its own: removal takes the whole block after a confirmation,
@@ -33,6 +33,6 @@ public class SignatureAbility
 
     public DateTime UpdatedAt { get; set; }
 
-    /// <summary>The most a Discord embed field displays (FR-13).</summary>
+    /// <summary>The most a Discord embed field displays.</summary>
     public const int MaxTextLength = 1024;
 }

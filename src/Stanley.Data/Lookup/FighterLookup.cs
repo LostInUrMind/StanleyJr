@@ -6,8 +6,8 @@ using Stanley.Data.Entities;
 namespace Stanley.Data.Lookup;
 
 /// <summary>
-/// Finds fighters by what a user typed: the tolerant match behind <c>/fighter</c> (FR-02) and
-/// the suggestions behind its autocomplete (FR-03).
+/// Finds fighters by what a user typed: the tolerant match behind <c>/fighter</c> and
+/// the suggestions behind its autocomplete.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -24,18 +24,18 @@ namespace Stanley.Data.Lookup;
 public sealed class FighterLookup(IDbContextFactory<StanleyDbContext> contextFactory)
 {
     /// <summary>
-    /// How alike two slugs must be for the fuzzy step of FR-02 to accept the match. The one
+    /// How alike two slugs must be for the fuzzy step of the lookup to accept the match. The one
     /// cutoff in the system: raising it rejects more typos, lowering it invents matches.
     /// </summary>
     public const double SimilarityCutoff = 0.4;
 
-    /// <summary>Discord shows at most this many autocomplete choices (FR-03).</summary>
+    /// <summary>Discord shows at most this many autocomplete choices.</summary>
     public const int MaxSuggestions = 25;
 
     /// <summary>The value the view's <c>kind</c> column carries for a variant's own name.</summary>
     /// <remarks>
     /// Internal rather than private because <c>/alias-admin add</c> reads the same view to find out
-    /// whether an alias clashes with a fighter's own name or with another alias (FR-10), and
+    /// whether an alias clashes with a fighter's own name or with another alias, and
     /// the two must agree on what the column says.
     /// </remarks>
     internal const string NameKind = "name";
@@ -198,6 +198,7 @@ public sealed class FighterLookup(IDbContextFactory<StanleyDbContext> contextFac
     private static FighterCard ToCard(Variant variant) => new(
         variant.Name,
         variant.Slug,
+        variant.Quote,
         variant.Tier.Name,
         variant.Element.Name,
         variant.Element.ColorHex,
